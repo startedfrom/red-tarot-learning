@@ -872,6 +872,426 @@ a {
   font-weight: 850;
 }
 
+.empty-state {
+  display: grid;
+  min-height: calc(100vh - 180px);
+  place-items: center;
+  align-content: center;
+  gap: 13px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-state > span {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border-radius: 26px;
+  background: var(--blush);
+  color: var(--cherry);
+  font-family: Georgia, serif;
+  font-size: 2rem;
+  transform: rotate(-5deg);
+}
+
+.empty-state h1 {
+  margin: 4px 0 0;
+  font-size: clamp(1.8rem, 8vw, 3rem);
+  letter-spacing: -0.06em;
+}
+
+.empty-state p {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.card-detail {
+  padding: 14px 0 58px;
+}
+
+.detail-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.77rem;
+  white-space: nowrap;
+}
+
+.detail-breadcrumb strong {
+  overflow: hidden;
+  color: var(--ink);
+  text-overflow: ellipsis;
+}
+
+.card-detail-hero {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  gap: 28px;
+  padding: 38px 0;
+}
+
+.detail-visual-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.detail-sticker {
+  position: absolute;
+  top: 2%;
+  right: -8%;
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  background: var(--sun);
+  box-shadow: 0 8px 20px rgba(108, 64, 21, 0.16);
+  color: var(--cherry-dark);
+  font-size: 1.25rem;
+  transform: rotate(9deg);
+}
+
+.detail-heading {
+  width: 100%;
+  text-align: center;
+}
+
+.detail-heading h1 {
+  margin: 8px 0 2px;
+  font-size: clamp(3rem, 16vw, 6.3rem);
+  letter-spacing: -0.08em;
+  line-height: 1;
+}
+
+.english-name {
+  margin: 0;
+  color: var(--muted);
+  font-family: Georgia, serif;
+  font-size: 0.84rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.verb-card {
+  display: inline-grid;
+  gap: 4px;
+  margin-top: 23px;
+  padding: 13px 18px;
+  border: 1px solid #ffc6cf;
+  border-radius: 17px;
+  background: var(--blush);
+}
+
+.verb-card span {
+  color: var(--muted);
+  font-size: 0.69rem;
+}
+
+.verb-card strong {
+  color: var(--cherry-dark);
+  font-size: 1.1rem;
+}
+
+.favorite-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 0 15px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.favorite-button svg {
+  width: 17px;
+}
+
+.favorite-button.is-favorite {
+  border-color: #ffc0c9;
+  background: var(--blush);
+  color: var(--cherry-dark);
+}
+
+.favorite-button.is-favorite svg {
+  fill: currentColor;
+}
+
+.save-message {
+  min-height: 1.2em;
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.detail-learning-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: var(--paper);
+  box-shadow: var(--shadow-soft);
+}
+
+.detail-tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 8px;
+  border-bottom: 1px solid var(--line);
+  background: #fbf0ea;
+}
+
+.detail-tabs button,
+.category-switch button {
+  min-width: max-content;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.detail-tabs button[aria-selected="true"],
+.category-switch button.is-active {
+  background: var(--paper);
+  box-shadow: 0 5px 14px rgba(73, 37, 40, 0.08);
+  color: var(--cherry-dark);
+}
+
+.detail-panel {
+  min-height: 330px;
+  padding: 24px 18px;
+}
+
+.panel-label {
+  color: var(--cherry);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.meaning-layout h2,
+.orientation-card h2,
+.category-meaning-grid h2 {
+  margin: 9px 0 0;
+  font-size: clamp(1.35rem, 5vw, 2rem);
+  line-height: 1.45;
+  letter-spacing: -0.04em;
+}
+
+.keyword-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 20px;
+}
+
+.keyword-list span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: var(--blush);
+  color: var(--cherry-dark);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.reading-tip,
+.mistake-note {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 18px;
+}
+
+.reading-tip {
+  background: #fff1c9;
+  color: #72501f;
+}
+
+.reading-tip svg,
+.mistake-note svg {
+  width: 21px;
+  flex: 0 0 auto;
+}
+
+.reading-tip p,
+.mistake-note p {
+  margin: 5px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+
+.orientation-grid,
+.category-meaning-grid,
+.symbol-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.orientation-card,
+.category-meaning-grid section,
+.symbol-grid section {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fffaf7;
+}
+
+.orientation-card.reversed-card {
+  background: #f5f0f8;
+}
+
+.orientation-title {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  align-items: center;
+  gap: 18px;
+}
+
+.orientation-title .tarot-visual {
+  width: 82px;
+}
+
+.orientation-title h2 {
+  font-size: 1rem;
+}
+
+.orientation-card h3 {
+  margin: 18px 0 7px;
+  font-size: 0.82rem;
+}
+
+.orientation-card ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.orientation-card li {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.dark-pill {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.category-switch {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 17px;
+  padding: 4px;
+  border-radius: 16px;
+  background: #f6ebe6;
+}
+
+.category-switch button {
+  flex: 1;
+}
+
+.category-meaning-grid {
+  margin-bottom: 13px;
+}
+
+.category-meaning-grid section:last-child {
+  background: #f5f0f8;
+}
+
+.category-meaning-grid h2 {
+  font-size: 1rem;
+}
+
+.symbol-grid section > span {
+  color: var(--cherry);
+}
+
+.symbol-grid h2 {
+  margin: 8px 0 5px;
+  font-size: 1.1rem;
+}
+
+.symbol-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.mistake-note {
+  background: var(--blush);
+  color: #823343;
+}
+
+.card-pagination {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.card-pagination > a {
+  display: flex;
+  min-height: 63px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: rgba(255, 253, 249, 0.76);
+  color: var(--muted);
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+.card-pagination svg {
+  width: 17px;
+  flex: 0 0 auto;
+}
+
+.card-pagination strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink);
+  font-size: 0.8rem;
+}
+
+.card-pagination .practice-promo {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  min-height: 48px;
+  border-color: #ffc6cf;
+  background: var(--blush);
+  color: var(--cherry-dark);
+  font-weight: 900;
+}
+
 @media (min-width: 840px) {
   .app-shell {
     padding-right: 28px;
@@ -940,6 +1360,56 @@ a {
 
   .continue-section h2 {
     font-size: 1.35rem;
+  }
+
+  .card-detail {
+    padding: 24px 5vw 92px;
+  }
+
+  .card-detail-hero {
+    grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1fr);
+    justify-items: start;
+    gap: 8vw;
+    padding: 58px 5vw;
+  }
+
+  .detail-heading {
+    text-align: left;
+  }
+
+  .detail-tabs {
+    justify-content: center;
+  }
+
+  .detail-panel {
+    padding: 36px;
+  }
+
+  .meaning-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+    gap: 40px;
+  }
+
+  .reading-tip {
+    margin-top: 0;
+  }
+
+  .orientation-grid,
+  .category-meaning-grid,
+  .symbol-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .card-pagination {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .card-pagination .practice-promo {
+    grid-column: auto;
+    grid-row: auto;
+    padding-right: 20px;
+    padding-left: 20px;
   }
 }
 

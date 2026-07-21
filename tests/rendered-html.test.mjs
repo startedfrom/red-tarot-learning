@@ -45,3 +45,25 @@ test("renders the Red Tarot home instead of the starter", async () => {
     /Your site is taking shape|codex-preview|react-loading-skeleton/i,
   );
 });
+
+test("renders a complete card detail", async () => {
+  const response = await render("/cards/the-lovers");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /연인/);
+  assert.match(html, /선택한다/);
+  assert.match(html, /핵심 의미/);
+  assert.match(html, /정·역방향/);
+  assert.match(html, /분야별/);
+  assert.match(html, /상징/);
+});
+
+test("renders a recovery view for an unknown card", async () => {
+  const response = await render("/cards/not-a-card");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /카드를 찾지 못했어요/);
+  assert.match(html, /바보 카드부터 보기/);
+});
