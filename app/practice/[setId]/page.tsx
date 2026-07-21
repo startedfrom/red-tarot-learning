@@ -21,7 +21,7 @@ export default async function PracticePage({
   const lesson = getLearningSet(setId);
   const cards = lesson?.cards.map((item) => getLessonCard(item.cardId));
   const completeCards = cards?.every(Boolean)
-    ? (cards as [TarotCard, TarotCard, TarotCard])
+    ? (cards as TarotCard[])
     : null;
 
   if (!lesson || !completeCards) {

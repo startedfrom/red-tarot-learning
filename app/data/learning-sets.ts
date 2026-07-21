@@ -1,22 +1,23 @@
-import { majorArcana, type Orientation, type TarotCard } from "./cards";
+import {
+  allCards,
+  getCard,
+  type Category,
+  type Orientation,
+} from "./cards";
 
 export type LearningSet = {
   id: string;
-  category: "love";
-  difficulty: "basic";
+  category: Category;
+  difficulty: "intro" | "basic" | "advanced";
   question: string;
   spread: {
-    type: "three";
-    positions: [string, string, string];
+    type: "one" | "three" | "five";
+    positions: string[];
   };
-  cards: [
-    { cardId: string; orientation: Orientation },
-    { cardId: string; orientation: Orientation },
-    { cardId: string; orientation: Orientation },
-  ];
+  cards: { cardId: string; orientation: Orientation }[];
   headline: string;
-  cardAnalysis: [string, string, string];
-  positionAnalysis: [string, string, string];
+  cardAnalysis: string[];
+  positionAnalysis: string[];
   connection: string;
   relationship: "강화" | "충돌" | "원인과 결과" | "문제와 해결" | "겉과 속";
   fullInterpretation: string;
@@ -31,98 +32,13 @@ export type LearningSet = {
   };
 };
 
-export const supportCards: TarotCard[] = [
-  {
-    id: "two-of-swords",
-    number: 2,
-    nameKo: "소드 2",
-    nameEn: "Two of Swords",
-    arcana: "minor",
-    coreVerb: "결정을 미룬다",
-    keywords: ["판단 유보", "방어", "균형", "회피", "침묵"],
-    coreMeaning: "상반된 선택 사이에서 감정을 닫고 결정을 미루는 상태",
-    upright: {
-      summary: "판단을 보류하며 균형을 유지함",
-      positive: ["신중함", "중립", "생각할 시간"],
-      caution: ["결정 회피", "감정 차단", "정보 부족"],
-    },
-    reversed: {
-      summary: "미뤄 온 갈등이 안에서 커지거나 결정이 드러남",
-      positive: ["결정의 필요를 인정함"],
-      caution: ["혼란", "압박", "자기기만"],
-      mode: "내면화",
-    },
-    categories: {
-      love: {
-        upright: "감정은 있어도 관계에 대한 결정을 미룸",
-        reversed: "숨겨 온 갈등이 드러나 선택을 피하기 어려움",
-      },
-      money: {
-        upright: "재정 결정을 미루며 정보를 더 모음",
-        reversed: "미뤄 온 계약이나 지출 결정을 급하게 처리함",
-      },
-      health: {
-        upright: "몸의 신호를 판단하지 못하고 조금 더 관찰함",
-        reversed: "불편함을 외면하기 어려워 점검 필요를 느낌",
-      },
-    },
-    symbolism: [
-      { symbol: "눈가리개", meaning: "사실을 바로 보지 않으려는 방어" },
-      { symbol: "교차한 검", meaning: "팽팽하게 맞선 두 선택" },
-    ],
-    commonMistakes: ["감정이 전혀 없다고 단정하거나 판단 유보를 영구적인 거절로 보는 것"],
-    visual: { glyph: "⚔", accent: "plum" },
-  },
-  {
-    id: "eight-of-cups",
-    number: 8,
-    nameKo: "컵 8",
-    nameEn: "Eight of Cups",
-    arcana: "minor",
-    coreVerb: "떠난다",
-    keywords: ["거리두기", "감정 정리", "이동", "미련", "의미 탐색"],
-    coreMeaning: "정서적 의미가 줄어든 상황에서 미련을 안고도 더 나은 방향을 찾는 상태",
-    upright: {
-      summary: "익숙한 감정에서 물러나 새 의미를 찾음",
-      positive: ["감정 정리", "자기존중", "새 방향"],
-      caution: ["회피", "미련", "성급한 단절"],
-    },
-    reversed: {
-      summary: "떠나지 못하고 같은 감정으로 돌아오거나 결정을 미룸",
-      positive: ["떠날 이유를 다시 확인함"],
-      caution: ["미련", "반복", "두려움"],
-      mode: "지연",
-    },
-    categories: {
-      love: {
-        upright: "관계에서 정서적으로 물러나 의미를 다시 찾음",
-        reversed: "떠나지도 머물지도 못한 채 같은 감정을 반복함",
-      },
-      money: {
-        upright: "수익이 있어도 의미 없는 일이나 계획을 정리함",
-        reversed: "손실이 두려워 비효율적인 선택을 붙잡음",
-      },
-      health: {
-        upright: "소진을 만든 환경이나 습관에서 거리를 둠",
-        reversed: "바꿔야 할 생활 습관을 알면서도 되돌아감",
-      },
-    },
-    symbolism: [
-      { symbol: "쌓인 컵", meaning: "완전히 비어 있지는 않은 기존 감정" },
-      { symbol: "먼 산", meaning: "익숙함을 떠나 찾는 더 깊은 의미" },
-    ],
-    commonMistakes: ["모든 경우를 영구적인 이별로 단정하는 것"],
-    visual: { glyph: "☾", accent: "apricot" },
-  },
-];
-
 const positions: [string, string, string] = [
   "현재 관계",
   "상대의 태도",
   "향후 흐름",
 ];
 
-export const learningSets: LearningSet[] = [
+const featuredLoveThreeSets: LearningSet[] = [
   {
     id: "love-three-001",
     category: "love",
@@ -485,10 +401,174 @@ export const learningSets: LearningSet[] = [
   },
 ];
 
+type SpreadType = LearningSet["spread"]["type"];
+
+const categoryLabels: Record<Category, string> = {
+  love: "연애",
+  money: "재물",
+  health: "건강",
+};
+
+const spreadPositions: Record<Category, Record<SpreadType, string[]>> = {
+  love: {
+    one: ["관계의 핵심 메시지"],
+    three: ["나의 상태", "상대의 상태", "관계의 흐름"],
+    five: ["현재 관계", "나의 감정과 태도", "상대의 감정과 태도", "관계의 장애물", "향후 방향 또는 조언"],
+  },
+  money: {
+    one: ["현재 돈에서 볼 점"],
+    three: ["현재 재정", "기회 또는 위험", "행동 방향"],
+    five: ["현재 재정 상태", "수입과 기회", "지출과 손실 요인", "숨은 위험", "재정 전략"],
+  },
+  health: {
+    one: ["오늘 몸과 생활에서 살펴볼 점"],
+    three: ["현재 컨디션", "영향을 주는 요인", "관리 방향"],
+    five: ["현재 에너지 상태", "생활 습관", "스트레스 요인", "회복에 도움이 되는 요소", "실천할 관리 방향"],
+  },
+};
+
+const scenarios: Record<Category, string[]> = {
+  love: [
+    "새로운 만남", "소개팅 뒤의 흐름", "짝사랑", "연락이 느린 썸", "관계 진전", "연애 중 소통",
+    "신뢰 회복", "권태기", "재회 고민", "장기 약속", "서로 다른 속도", "감정과 행동의 차이",
+    "거리두기", "반복되는 갈등", "건강한 경계",
+  ],
+  money: [
+    "월급과 고정 수입", "부업 기회", "예상하지 못한 지출", "저축 계획", "부채 정리", "투자 위험 관리",
+    "장기 투자", "사업 확장", "계약 검토", "현금 흐름", "연봉 협상", "이직과 보상", "과소비",
+    "비상자금", "재정 습관",
+  ],
+  health: [
+    "오늘의 활력", "피로 누적", "수면 리듬", "식사 습관", "운동 계획", "업무 스트레스", "감정적 부담",
+    "휴식과 회복", "생활 균형", "몸의 신호 알아차리기", "무리한 일정", "도움 요청", "꾸준한 자기관리",
+    "긴장 완화", "점진적 습관 개선",
+  ],
+};
+
+const relationships: LearningSet["relationship"][] = [
+  "강화",
+  "충돌",
+  "원인과 결과",
+  "문제와 해결",
+  "겉과 속",
+];
+
+const spreadCounts: Record<SpreadType, number> = {
+  one: 1,
+  three: 3,
+  five: 5,
+};
+
+function buildLearningSet(
+  category: Category,
+  type: SpreadType,
+  ordinal: number,
+): LearningSet {
+  const categoryIndex = ["love", "money", "health"].indexOf(category);
+  const typeIndex = ["one", "three", "five"].indexOf(type);
+  const seed = categoryIndex * 67 + typeIndex * 29 + ordinal;
+  const positions = spreadPositions[category][type];
+  const selectedCards = Array.from({ length: spreadCounts[type] }, (_, index) => {
+    const card = allCards[(seed * 7 + index * 11) % allCards.length];
+    const orientation: Orientation = (seed + index) % 4 === 0 ? "reversed" : "upright";
+    return { card, orientation };
+  });
+  const scenario = scenarios[category][(ordinal - 1) % scenarios[category].length];
+  const relationship = relationships[seed % relationships.length];
+  const first = selectedCards[0];
+  const last = selectedCards[selectedCards.length - 1];
+  const readingParts = selectedCards.map(({ card, orientation }) =>
+    orientation === "upright"
+      ? card.categories[category].upright
+      : card.categories[category].reversed,
+  );
+  const healthSafety =
+    category === "health"
+      ? " 이 해석은 생활 습관을 돌아보기 위한 학습 정보예요. 지속되거나 심한 증상이 있다면 카드보다 의료 전문가의 평가를 먼저 받아야 해요."
+      : "";
+  const correctOption = `${positions[0]} 위치의 ${first.card.nameKo}을 ‘${first.card.coreVerb}’라는 움직임으로 읽기`;
+  const distractors = [
+    "마지막 카드 하나만 보고 결말을 확정하기",
+    "카드의 분야 의미 없이 기본 키워드만 나열하기",
+    "불편한 카드를 나쁜 사건의 보장으로 단정하기",
+  ];
+  const answer = seed % 4;
+  const options = [...distractors];
+  options.splice(answer, 0, correctOption);
+  const spreadLabel = `${spreadCounts[type]}장`;
+
+  return {
+    id: `${category}-${type}-${String(ordinal).padStart(3, "0")}`,
+    category,
+    difficulty: type === "one" ? "intro" : type === "three" ? "basic" : "advanced",
+    question: `${scenario}에서 어떤 흐름과 행동 방향을 살펴볼까요?`,
+    spread: { type, positions },
+    cards: selectedCards.map(({ card, orientation }) => ({ cardId: card.id, orientation })),
+    headline:
+      type === "one"
+        ? `${first.card.nameKo}의 ‘${first.card.coreVerb}’를 ${scenario}의 핵심으로 읽어요`
+        : `${first.card.coreVerb}에서 ${last.card.coreVerb}로 이어지는 ${categoryLabels[category]} 흐름이에요`,
+    cardAnalysis: selectedCards.map(({ card, orientation }) =>
+      orientation === "upright"
+        ? `${card.nameKo} 정방향은 ${card.upright.summary}을 보여줘요.`
+        : `${card.nameKo} 역방향은 ${card.reversed.mode} 방식으로 ${card.reversed.summary}을 보여줘요.`,
+    ),
+    positionAnalysis: selectedCards.map(
+      ({ card }, index) => `${positions[index]}에서는 ${card.nameKo}의 ‘${card.coreVerb}’를 주어에 붙여 읽어요. ${readingParts[index]}`,
+    ),
+    connection: selectedCards.map(({ card }) => card.coreVerb).join(" → "),
+    relationship,
+    fullInterpretation:
+      type === "one"
+        ? `${first.card.nameKo}은 ${readingParts[0]} 이 한 장은 특정 사건을 확정하기보다 지금 가장 먼저 살필 에너지와 행동을 보여줘요.${healthSafety}`
+        : `${positions[0]}의 ${first.card.nameKo}은 ${readingParts[0]} 마지막 ${positions[positions.length - 1]}의 ${last.card.nameKo}은 ${readingParts[readingParts.length - 1]} 가운데 카드는 두 지점 사이의 이유와 조정 과정을 보여줘요. 전체 흐름은 ‘${selectedCards.map(({ card }) => card.coreVerb).join(" → ")}’로 압축하되 하나의 결말로 단정하지 않는 것이 핵심이에요.${healthSafety}`,
+    alternatives: [
+      `${scenario}의 외부 사건보다 질문한 사람의 태도와 선택이 더 강하게 드러난 배열일 수도 있어요.`,
+    ],
+    conditions: [
+      `실제 대화, 계약, 생활 기록처럼 확인 가능한 정보가 달라지면 같은 카드도 다른 방향으로 읽을 수 있어요.`,
+    ],
+    commonMistakes: [
+      `${spreadLabel} 배열의 일부 키워드만 보고 ${scenario}의 결과를 확정하는 것`,
+    ],
+    quiz: {
+      question: "이 배열을 배우는 가장 타당한 접근은 무엇일까요?",
+      options: options as [string, string, string, string],
+      answer,
+      rationale: "카드의 중심 동사를 먼저 찾고, 배열 위치의 주어와 분야 의미를 차례로 연결해야 해요.",
+    },
+  };
+}
+
+const generatedLoveSets = [
+  ...Array.from({ length: 10 }, (_, index) => buildLearningSet("love", "one", index + 1)),
+  ...Array.from({ length: 15 }, (_, index) => buildLearningSet("love", "three", index + 11)),
+  ...Array.from({ length: 15 }, (_, index) => buildLearningSet("love", "five", index + 1)),
+];
+
+const generatedMoneySets = [
+  ...Array.from({ length: 10 }, (_, index) => buildLearningSet("money", "one", index + 1)),
+  ...Array.from({ length: 25 }, (_, index) => buildLearningSet("money", "three", index + 1)),
+  ...Array.from({ length: 15 }, (_, index) => buildLearningSet("money", "five", index + 1)),
+];
+
+const generatedHealthSets = [
+  ...Array.from({ length: 10 }, (_, index) => buildLearningSet("health", "one", index + 1)),
+  ...Array.from({ length: 25 }, (_, index) => buildLearningSet("health", "three", index + 1)),
+  ...Array.from({ length: 15 }, (_, index) => buildLearningSet("health", "five", index + 1)),
+];
+
+export const learningSets: LearningSet[] = [
+  ...featuredLoveThreeSets,
+  ...generatedLoveSets,
+  ...generatedMoneySets,
+  ...generatedHealthSets,
+];
+
 export function getLearningSet(setId: string) {
   return learningSets.find((set) => set.id === setId);
 }
 
 export function getLessonCard(cardId: string) {
-  return [...majorArcana, ...supportCards].find((card) => card.id === cardId);
+  return getCard(cardId);
 }

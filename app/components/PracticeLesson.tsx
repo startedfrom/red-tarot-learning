@@ -29,6 +29,7 @@ import {
   safeReadProgress,
   safeWriteProgress,
 } from "../lib/progress";
+import { SafetyNote } from "./SafetyNote";
 import { TarotCardVisual } from "./TarotCardVisual";
 
 type LessonStage = 1 | 2 | 3 | 4 | 5;
@@ -46,13 +47,14 @@ export function PracticeLesson({
   cards,
 }: {
   lesson: LearningSet;
-  cards: [TarotCard, TarotCard, TarotCard];
+  cards: TarotCard[];
 }) {
   const [stage, setStage] = useState<LessonStage>(1);
   const [interpretation, setInterpretation] = useState("");
   const [quizChoice, setQuizChoice] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [answerView, setAnswerView] = useState<"reading" | "quiz">("reading");
   const [saveMessage, setSaveMessage] = useState("");
   const lessonIndex = learningSets.findIndex((item) => item.id === lesson.id);
   const previousLesson =
@@ -109,14 +111,18 @@ export function PracticeLesson({
     <article className="practice-page">
       <header className="practice-header">
         <div>
-          <span className="eyebrow">LOVE · BASIC · 3 CARDS</span>
+          <span className="eyebrow">
+            {lesson.category.toUpperCase()} · {lesson.difficulty.toUpperCase()} · {cards.length} CARDS
+          </span>
           <h1>카드를 연결해 한 문장으로 읽어봐요.</h1>
           <p>{lesson.question}</p>
         </div>
         <span className="lesson-count">
-          {lessonIndex + 1}<small>/10</small>
+          {lessonIndex + 1}<small>/150</small>
         </span>
       </header>
+
+      {lesson.category === "health" ? <SafetyNote /> : null}
 
       <ol className="stage-track" aria-label="학습 단계">
         {stageLabels.map((label, index) => {
@@ -134,9 +140,11 @@ export function PracticeLesson({
         })}
       </ol>
 
-      <section className="spread-board" aria-label="연애 3장 배열">
-        <div className="spread-ribbon">연애 3장 배열</div>
-        <div className="spread-grid">
+      <section className="spread-board" aria-label={`${cards.length}장 배열`}>
+        <div className="spread-ribbon">
+          {lesson.category === "love" ? "연애" : lesson.category === "money" ? "재물" : "건강"} {cards.length}장 배열
+        </div>
+        <div className={`spread-grid spread-${cards.length}`}>
           {cards.map((card, index) => (
             <div className="spread-item" key={`${card.id}-${index}`}>
               <span className="position-label">
@@ -146,7 +154,7 @@ export function PracticeLesson({
               <TarotCardVisual
                 card={card}
                 orientation={lesson.cards[index].orientation}
-                size="medium"
+                size={cards.length === 5 ? "small" : "medium"}
               />
               <strong>{card.nameKo}</strong>
               <small>
@@ -264,83 +272,105 @@ export function PracticeLesson({
 
         {stage === 5 ? (
           <div className="full-answer">
-            <section className="answer-summary">
-              <span className="soft-pill">가장 일반적인 해석</span>
-              <h3>{lesson.headline}</h3>
-              <p>{lesson.fullInterpretation}</p>
-            </section>
-            <div className="answer-detail-grid">
-              <section>
-                <span>가능한 대안</span>
-                <p>{lesson.alternatives[0]}</p>
-              </section>
-              <section>
-                <span>달라지는 조건</span>
-                <p>{lesson.conditions[0]}</p>
-              </section>
-              <section className="mistake-card">
-                <span>흔한 오해</span>
-                <p>{lesson.commonMistakes[0]}</p>
-              </section>
-            </div>
-            {interpretation ? (
-              <section className="compare-answer">
-                <span>내 해석과 비교하기</span>
-                <p>{interpretation}</p>
-                <small>
-                  카드 뜻 · 위치 · 분야 · 연결 · 단정하지 않는 표현이 들어갔는지
-                  확인해보세요.
-                </small>
-              </section>
-            ) : null}
-
-            <section className="quiz-card">
-              <span className="eyebrow">QUICK QUIZ</span>
-              <h3>{lesson.quiz.question}</h3>
-              <div className="quiz-options">
-                {lesson.quiz.options.map((option, index) => {
-                  const selected = quizChoice === index;
-                  const isAnswer = submitted && index === lesson.quiz.answer;
-                  const isWrong = submitted && selected && !isAnswer;
-                  return (
-                    <button
-                      key={option}
-                      type="button"
-                      className={`${selected ? "is-selected" : ""} ${isAnswer ? "is-answer" : ""} ${isWrong ? "is-wrong" : ""}`}
-                      onClick={() => {
-                        if (!submitted) setQuizChoice(index);
-                      }}
-                      aria-pressed={selected}
-                    >
-                      <span>{String.fromCharCode(65 + index)}</span>
-                      {option}
-                      {isAnswer ? <Check aria-label="정답" /> : null}
-                      {isWrong ? <X aria-label="오답" /> : null}
-                    </button>
-                  );
-                })}
-              </div>
-              {submitted ? (
-                <div className={`quiz-result ${correct ? "is-correct" : ""}`}>
-                  {correct ? <Check aria-hidden="true" /> : <RotateCcw aria-hidden="true" />}
-                  <div>
-                    <strong>{correct ? "좋아요, 근거가 정확해요!" : "한 번 더 연결해볼까요?"}</strong>
-                    <p>{lesson.quiz.rationale}</p>
-                  </div>
-                </div>
-              ) : null}
-              <button className="primary-button quiz-submit" type="button" onClick={saveQuizResult}>
-                답 확인하고 복습 저장
+            <div className="answer-switch" aria-label="종합 해설 보기">
+              <button
+                type="button"
+                className={answerView === "reading" ? "is-active" : ""}
+                onClick={() => setAnswerView("reading")}
+                aria-pressed={answerView === "reading"}
+              >
+                종합 해설
               </button>
-              <p className="save-message" role="status" aria-live="polite">
-                {saveMessage}
-              </p>
-              {completed ? (
-                <Link className="next-lesson-link" href={`/practice/${nextLesson.id}`}>
-                  다음 학습 이어가기 <ArrowRight aria-hidden="true" />
-                </Link>
-              ) : null}
-            </section>
+              <button
+                type="button"
+                className={answerView === "quiz" ? "is-active" : ""}
+                onClick={() => setAnswerView("quiz")}
+                aria-pressed={answerView === "quiz"}
+              >
+                퀴즈
+              </button>
+            </div>
+
+            {answerView === "reading" ? (
+              <div className="answer-reading">
+                <section className="answer-summary">
+                  <span className="soft-pill">가장 일반적인 해석</span>
+                  <h3>{lesson.headline}</h3>
+                  <p>{lesson.fullInterpretation}</p>
+                </section>
+                <div className="answer-detail-grid">
+                  <section>
+                    <span>가능한 대안</span>
+                    <p>{lesson.alternatives[0]}</p>
+                  </section>
+                  <section>
+                    <span>달라지는 조건</span>
+                    <p>{lesson.conditions[0]}</p>
+                  </section>
+                  <section className="mistake-card">
+                    <span>흔한 오해</span>
+                    <p>{lesson.commonMistakes[0]}</p>
+                  </section>
+                </div>
+                {interpretation ? (
+                  <section className="compare-answer">
+                    <span>내 해석과 비교하기</span>
+                    <p>{interpretation}</p>
+                    <small>
+                      카드 뜻 · 위치 · 분야 · 연결 · 단정하지 않는 표현이 들어갔는지 확인해보세요.
+                    </small>
+                  </section>
+                ) : null}
+              </div>
+            ) : (
+              <section className="quiz-card">
+                <span className="eyebrow">QUICK QUIZ</span>
+                <h3>{lesson.quiz.question}</h3>
+                <div className="quiz-options">
+                  {lesson.quiz.options.map((option, index) => {
+                    const selected = quizChoice === index;
+                    const isAnswer = submitted && index === lesson.quiz.answer;
+                    const isWrong = submitted && selected && !isAnswer;
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        className={`${selected ? "is-selected" : ""} ${isAnswer ? "is-answer" : ""} ${isWrong ? "is-wrong" : ""}`}
+                        onClick={() => {
+                          if (!submitted) setQuizChoice(index);
+                        }}
+                        aria-pressed={selected}
+                      >
+                        <span>{String.fromCharCode(65 + index)}</span>
+                        {option}
+                        {isAnswer ? <Check aria-label="정답" /> : null}
+                        {isWrong ? <X aria-label="오답" /> : null}
+                      </button>
+                    );
+                  })}
+                </div>
+                {submitted ? (
+                  <div className={`quiz-result ${correct ? "is-correct" : ""}`}>
+                    {correct ? <Check aria-hidden="true" /> : <RotateCcw aria-hidden="true" />}
+                    <div>
+                      <strong>{correct ? "좋아요, 근거가 정확해요!" : "한 번 더 연결해볼까요?"}</strong>
+                      <p>{lesson.quiz.rationale}</p>
+                    </div>
+                  </div>
+                ) : null}
+                <button className="primary-button quiz-submit" type="button" onClick={saveQuizResult}>
+                  답 확인하고 복습 저장
+                </button>
+                <p className="save-message" role="status" aria-live="polite">
+                  {saveMessage}
+                </p>
+                {completed ? (
+                  <Link className="next-lesson-link" href={`/practice/${nextLesson.id}`}>
+                    다음 학습 이어가기 <ArrowRight aria-hidden="true" />
+                  </Link>
+                ) : null}
+              </section>
+            )}
           </div>
         ) : null}
 

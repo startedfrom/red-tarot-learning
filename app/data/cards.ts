@@ -711,6 +711,408 @@ const cardSeeds: CardSeed[] = [
 
 export const majorArcana = cardSeeds.map(makeCard);
 
+type MinorSuitSeed = {
+  id: "wands" | "cups" | "swords" | "pentacles";
+  nameKo: string;
+  nameEn: string;
+  theme: string;
+  keywords: [string, string];
+  suitSymbol: [string, string];
+  categoryLens: Record<Category, string>;
+  glyph: string;
+  accent: TarotCard["visual"]["accent"];
+};
+
+type MinorRankSeed = {
+  id: string;
+  number: number;
+  nameKo: string;
+  nameEn: string;
+  coreVerb: string;
+  keywords: [string, string];
+  coreMeaning: string;
+  uprightSummary: string;
+  positive: [string, string];
+  caution: [string, string];
+  reversedSummary: string;
+  reversedPositive: string;
+  reversedCaution: [string, string];
+  reversalMode: ReversalMode;
+  application: [string, string];
+  rankSymbol: [string, string];
+};
+
+const minorSuits: MinorSuitSeed[] = [
+  {
+    id: "wands",
+    nameKo: "완드",
+    nameEn: "Wands",
+    theme: "의지와 행동 에너지",
+    keywords: ["열정", "실행"],
+    suitSymbol: ["싹이 난 지팡이", "아이디어를 움직이는 생명력"],
+    categoryLens: {
+      love: "끌림과 관계를 움직이는 행동",
+      money: "일과 사업의 추진력",
+      health: "활동량과 에너지 사용",
+    },
+    glyph: "✦",
+    accent: "cherry",
+  },
+  {
+    id: "cups",
+    nameKo: "컵",
+    nameEn: "Cups",
+    theme: "감정과 관계의 흐름",
+    keywords: ["감정", "교감"],
+    suitSymbol: ["물이 담긴 컵", "마음이 담기고 오가는 그릇"],
+    categoryLens: {
+      love: "감정의 교환과 친밀감",
+      money: "돈에서 느끼는 만족과 관계",
+      health: "감정 리듬과 휴식",
+    },
+    glyph: "♥",
+    accent: "apricot",
+  },
+  {
+    id: "swords",
+    nameKo: "소드",
+    nameEn: "Swords",
+    theme: "생각과 판단의 힘",
+    keywords: ["사고", "결정"],
+    suitSymbol: ["곧게 선 검", "사실을 구분하고 결단하는 사고"],
+    categoryLens: {
+      love: "대화와 관계의 경계",
+      money: "계약과 재정 판단",
+      health: "생각의 긴장과 스트레스 관리",
+    },
+    glyph: "✧",
+    accent: "plum",
+  },
+  {
+    id: "pentacles",
+    nameKo: "펜타클",
+    nameEn: "Pentacles",
+    theme: "현실과 자원의 축적",
+    keywords: ["현실", "안정"],
+    suitSymbol: ["별이 새겨진 동전", "시간을 들여 쌓는 실질적 자원"],
+    categoryLens: {
+      love: "관계를 지탱하는 시간과 생활",
+      money: "수입·지출·자산의 현실적 흐름",
+      health: "몸의 기본 리듬과 생활 습관",
+    },
+    glyph: "✿",
+    accent: "gold",
+  },
+];
+
+const minorRanks: MinorRankSeed[] = [
+  {
+    id: "ace",
+    number: 1,
+    nameKo: "에이스",
+    nameEn: "Ace",
+    coreVerb: "시작한다",
+    keywords: ["씨앗", "기회"],
+    coreMeaning: "작지만 선명한 가능성이 처음 모습을 드러내는 상태",
+    uprightSummary: "새 가능성이 열림",
+    positive: ["좋은 출발", "집중할 씨앗"],
+    caution: ["가능성만 보고 준비를 생략함", "시작을 결과로 착각함"],
+    reversedSummary: "시작할 힘이 막히거나 씨앗을 놓침",
+    reversedPositive: "무엇부터 시작할지 다시 고름",
+    reversedCaution: ["동기 저하", "기회 낭비"],
+    reversalMode: "차단",
+    application: ["새로운 가능성을 작게 시작해요", "시작을 서두르지 말고 준비 상태를 점검해요"],
+    rankSymbol: ["하나의 손", "지금 건네받은 첫 가능성"],
+  },
+  {
+    id: "two",
+    number: 2,
+    nameKo: "2",
+    nameEn: "Two",
+    coreVerb: "비교한다",
+    keywords: ["선택", "균형"],
+    coreMeaning: "두 방향을 함께 바라보며 선택과 균형을 고민하는 상태",
+    uprightSummary: "두 가능성을 비교하고 균형을 잡음",
+    positive: ["신중한 선택", "상호 조율"],
+    caution: ["결정 미룸", "눈치 보기"],
+    reversedSummary: "균형이 무너지거나 선택을 오래 미룸",
+    reversedPositive: "우선순위를 분명히 함",
+    reversedCaution: ["우유부단", "한쪽으로 치우침"],
+    reversalMode: "지연",
+    application: ["두 선택의 기준을 비교해요", "모든 것을 붙잡지 말고 우선순위를 정해요"],
+    rankSymbol: ["마주 보는 둘", "관계와 선택 사이의 긴장"],
+  },
+  {
+    id: "three",
+    number: 3,
+    nameKo: "3",
+    nameEn: "Three",
+    coreVerb: "확장한다",
+    keywords: ["성장", "협력"],
+    coreMeaning: "첫 선택이 다른 사람과 환경을 만나 더 넓게 자라는 상태",
+    uprightSummary: "협력과 경험으로 범위가 넓어짐",
+    positive: ["성장", "팀워크"],
+    caution: ["역할 혼선", "결과를 서두름"],
+    reversedSummary: "협력이 어긋나거나 성장이 더뎌짐",
+    reversedPositive: "역할과 기대를 다시 맞춤",
+    reversedCaution: ["소통 부족", "확장 지연"],
+    reversalMode: "지연",
+    application: ["혼자보다 함께 범위를 넓혀요", "협력 방식과 기대를 다시 맞춰요"],
+    rankSymbol: ["세 개의 점", "개인에서 관계와 공동 작업으로 넓어짐"],
+  },
+  {
+    id: "four",
+    number: 4,
+    nameKo: "4",
+    nameEn: "Four",
+    coreVerb: "고정한다",
+    keywords: ["안정", "경계"],
+    coreMeaning: "쌓아 온 것을 지키기 위해 구조와 경계를 만드는 상태",
+    uprightSummary: "안정된 틀과 휴식 지점을 만듦",
+    positive: ["안정", "보존"],
+    caution: ["경직", "변화 거부"],
+    reversedSummary: "안정이 답답함으로 바뀌거나 기반이 흔들림",
+    reversedPositive: "필요 없는 경계를 느슨하게 함",
+    reversedCaution: ["불안정", "과도한 방어"],
+    reversalMode: "과잉",
+    application: ["지킬 것과 나눌 것을 분명히 해요", "안전을 위한 통제가 과하지 않은지 살펴요"],
+    rankSymbol: ["네 모서리", "흔들림을 줄이는 구조와 틀"],
+  },
+  {
+    id: "five",
+    number: 5,
+    nameKo: "5",
+    nameEn: "Five",
+    coreVerb: "부딪힌다",
+    keywords: ["갈등", "변화"],
+    coreMeaning: "기존 균형이 흔들리며 부족함과 갈등을 직접 마주하는 상태",
+    uprightSummary: "갈등을 통해 숨은 문제를 봄",
+    positive: ["문제 인식", "변화의 계기"],
+    caution: ["경쟁 과열", "결핍에만 집중함"],
+    reversedSummary: "갈등을 피하거나 안에서 오래 끌어안음",
+    reversedPositive: "불필요한 싸움에서 물러남",
+    reversedCaution: ["갈등 억압", "패배감"],
+    reversalMode: "내면화",
+    application: ["불편한 문제를 인정하고 대응해요", "갈등을 숨기지 말고 도움과 대안을 찾아요"],
+    rankSymbol: ["흐트러진 다섯", "안정된 틀을 흔드는 변화"],
+  },
+  {
+    id: "six",
+    number: 6,
+    nameKo: "6",
+    nameEn: "Six",
+    coreVerb: "회복한다",
+    keywords: ["조화", "회복"],
+    coreMeaning: "갈등 뒤에 균형을 되찾고 서로 주고받는 방식을 배우는 상태",
+    uprightSummary: "조화와 도움으로 균형을 회복함",
+    positive: ["상호 지원", "회복"],
+    caution: ["인정 욕구", "불균형한 도움"],
+    reversedSummary: "주고받음이 한쪽으로 기울거나 회복이 늦어짐",
+    reversedPositive: "도움의 조건을 분명히 함",
+    reversedCaution: ["의존", "보상 심리"],
+    reversalMode: "결핍",
+    application: ["필요한 도움을 주고받으며 균형을 되찾아요", "한쪽만 감당하지 않도록 교환 방식을 조정해요"],
+    rankSymbol: ["균형 잡힌 여섯", "갈등 뒤 다시 맞춰지는 흐름"],
+  },
+  {
+    id: "seven",
+    number: 7,
+    nameKo: "7",
+    nameEn: "Seven",
+    coreVerb: "시험한다",
+    keywords: ["점검", "전략"],
+    coreMeaning: "지금까지의 선택을 시험하며 무엇을 지킬지 전략을 세우는 상태",
+    uprightSummary: "상황을 점검하고 나만의 기준을 지킴",
+    positive: ["전략", "자기 기준"],
+    caution: ["의심 과잉", "고집"],
+    reversedSummary: "기준이 흔들리거나 점검이 불안으로 번짐",
+    reversedPositive: "지나친 방어를 내려놓음",
+    reversedCaution: ["혼란", "자신감 저하"],
+    reversalMode: "내면화",
+    application: ["지금 선택이 기준에 맞는지 시험해요", "의심만 반복하지 말고 확인 가능한 근거를 찾아요"],
+    rankSymbol: ["홀로 선 일곱", "외부 압력 속에서 지키는 자기 기준"],
+  },
+  {
+    id: "eight",
+    number: 8,
+    nameKo: "8",
+    nameEn: "Eight",
+    coreVerb: "움직인다",
+    keywords: ["진행", "반복"],
+    coreMeaning: "쌓인 힘이 실제 움직임과 반복 행동으로 이어지는 상태",
+    uprightSummary: "빠른 진행이나 꾸준한 반복이 생김",
+    positive: ["숙련", "진전"],
+    caution: ["속도 과잉", "자동적인 반복"],
+    reversedSummary: "움직임이 막히거나 같은 패턴을 반복함",
+    reversedPositive: "속도와 방식을 조정함",
+    reversedCaution: ["지연", "비효율 반복"],
+    reversalMode: "지연",
+    application: ["작은 행동을 반복해 흐름을 만들어요", "속도보다 반복 방식이 건강한지 점검해요"],
+    rankSymbol: ["이어지는 여덟", "연습이 움직임과 숙련으로 바뀌는 과정"],
+  },
+  {
+    id: "nine",
+    number: 9,
+    nameKo: "9",
+    nameEn: "Nine",
+    coreVerb: "버틴다",
+    keywords: ["성숙", "마지막 점검"],
+    coreMeaning: "완성 직전까지 쌓은 것을 지키며 마지막 과제를 견디는 상태",
+    uprightSummary: "경험을 바탕으로 마지막 단계를 버팀",
+    positive: ["회복력", "성숙함"],
+    caution: ["경계 과잉", "혼자 버팀"],
+    reversedSummary: "버틸 힘이 줄거나 경계가 지나치게 높아짐",
+    reversedPositive: "쉬거나 도움을 받을 때를 앎",
+    reversedCaution: ["소진", "고립"],
+    reversalMode: "결핍",
+    application: ["쌓아 온 힘으로 마지막 과제를 살펴요", "무조건 버티지 말고 회복 자원과 도움을 확인해요"],
+    rankSymbol: ["마지막 앞의 아홉", "완성을 앞둔 성숙과 피로"],
+  },
+  {
+    id: "ten",
+    number: 10,
+    nameKo: "10",
+    nameEn: "Ten",
+    coreVerb: "완결한다",
+    keywords: ["결과", "전환"],
+    coreMeaning: "한 주기가 충분히 쌓여 결과와 다음 전환을 함께 맞는 상태",
+    uprightSummary: "한 과정의 결과가 분명해짐",
+    positive: ["완성", "책임의 결실"],
+    caution: ["과부하", "결과에 안주함"],
+    reversedSummary: "마무리가 늦거나 결과의 무게에 눌림",
+    reversedPositive: "감당할 몫을 다시 나눔",
+    reversedCaution: ["과도한 부담", "끝내지 못함"],
+    reversalMode: "과잉",
+    application: ["쌓인 과정의 결과를 정리하고 다음으로 넘어가요", "모든 부담을 혼자 지지 말고 마무리 방식을 바꿔요"],
+    rankSymbol: ["가득 찬 열", "완성과 다음 순환이 맞닿은 지점"],
+  },
+  {
+    id: "page",
+    number: 11,
+    nameKo: "페이지",
+    nameEn: "Page",
+    coreVerb: "탐색한다",
+    keywords: ["호기심", "소식"],
+    coreMeaning: "익숙하지 않은 영역을 배우며 새로운 신호를 발견하는 상태",
+    uprightSummary: "호기심을 따라 배우고 소식을 접함",
+    positive: ["학습", "열린 태도"],
+    caution: ["미숙함", "가벼운 약속"],
+    reversedSummary: "호기심이 산만함이 되거나 배움을 미룸",
+    reversedPositive: "기초부터 다시 익힘",
+    reversedCaution: ["집중 부족", "성급한 전달"],
+    reversalMode: "차단",
+    application: ["모른다는 태도로 새 신호를 배워요", "말보다 실제로 배우고 확인하는 과정이 필요해요"],
+    rankSymbol: ["젊은 전령", "새 경험을 알리는 호기심과 소식"],
+  },
+  {
+    id: "knight",
+    number: 12,
+    nameKo: "나이트",
+    nameEn: "Knight",
+    coreVerb: "추진한다",
+    keywords: ["행동", "추구"],
+    coreMeaning: "분명한 목표를 향해 강하게 움직이며 경험을 넓히는 상태",
+    uprightSummary: "목표를 향해 적극적으로 움직임",
+    positive: ["추진력", "용기"],
+    caution: ["성급함", "한 방향만 봄"],
+    reversedSummary: "움직임이 과격해지거나 방향을 잃음",
+    reversedPositive: "행동 전 목적을 다시 확인함",
+    reversedCaution: ["충동", "공회전"],
+    reversalMode: "과잉",
+    application: ["원하는 방향으로 실제 행동을 시작해요", "빠른 행동이 상대와 상황을 압박하지 않는지 봐요"],
+    rankSymbol: ["달리는 기사", "목표를 향해 경험을 넓히는 행동"],
+  },
+  {
+    id: "queen",
+    number: 13,
+    nameKo: "퀸",
+    nameEn: "Queen",
+    coreVerb: "기른다",
+    keywords: ["내적 성숙", "돌봄"],
+    coreMeaning: "경험을 내면에서 성숙시키고 자신과 주변을 안정적으로 돌보는 상태",
+    uprightSummary: "내적 확신과 돌봄으로 상황을 기름",
+    positive: ["성숙함", "수용력"],
+    caution: ["과보호", "감정 소진"],
+    reversedSummary: "돌봄이 고갈되거나 확신이 안으로 막힘",
+    reversedPositive: "나를 먼저 돌봄",
+    reversedCaution: ["자기희생", "불안정한 자존감"],
+    reversalMode: "내면화",
+    application: ["내 기준을 믿으며 꾸준히 돌봐요", "타인을 챙기기 전에 내 자원과 경계를 확인해요"],
+    rankSymbol: ["앉아 있는 여왕", "밖으로 서두르기 전 완성된 내적 힘"],
+  },
+  {
+    id: "king",
+    number: 14,
+    nameKo: "킹",
+    nameEn: "King",
+    coreVerb: "이끈다",
+    keywords: ["숙련", "책임"],
+    coreMeaning: "경험을 현실적인 기준과 책임으로 바꾸어 상황을 이끄는 상태",
+    uprightSummary: "숙련된 판단과 책임으로 방향을 이끎",
+    positive: ["리더십", "일관성"],
+    caution: ["독단", "통제"],
+    reversedSummary: "책임이 통제로 바뀌거나 숙련을 과신함",
+    reversedPositive: "다른 관점을 받아들임",
+    reversedCaution: ["권위주의", "책임 회피"],
+    reversalMode: "과잉",
+    application: ["경험을 기준으로 바꾸어 책임 있게 이끌어요", "내 방식만 옳다고 여기지 말고 다른 목소리를 들어요"],
+    rankSymbol: ["왕의 왕좌", "경험을 사회적 책임으로 사용하는 위치"],
+  },
+];
+
+const makeMinorCard = (
+  suit: MinorSuitSeed,
+  rank: MinorRankSeed,
+): TarotCard => ({
+  id: `${rank.id}-of-${suit.id}`,
+  number: rank.number,
+  nameKo: `${suit.nameKo} ${rank.nameKo}`,
+  nameEn: `${rank.nameEn} of ${suit.nameEn}`,
+  arcana: "minor",
+  coreVerb: rank.coreVerb,
+  keywords: [suit.keywords[0], rank.keywords[0], suit.keywords[1], rank.keywords[1]],
+  coreMeaning: `${suit.theme}에서 ${rank.coreMeaning}`,
+  upright: {
+    summary: `${suit.theme}에서 ${rank.uprightSummary}`,
+    positive: [rank.positive[0], rank.positive[1], suit.keywords[1]],
+    caution: [rank.caution[0], rank.caution[1], `${suit.theme}의 과잉`],
+  },
+  reversed: {
+    summary: `${suit.theme}에서 ${rank.reversedSummary}`,
+    positive: [rank.reversedPositive],
+    caution: [rank.reversedCaution[0], rank.reversedCaution[1], `${suit.theme}의 막힘`],
+    mode: rank.reversalMode,
+  },
+  categories: {
+    love: {
+      upright: `${suit.categoryLens.love}에서 ${rank.application[0]}`,
+      reversed: `${suit.categoryLens.love}에서 ${rank.application[1]}`,
+    },
+    money: {
+      upright: `${suit.categoryLens.money}에서 ${rank.application[0]}`,
+      reversed: `${suit.categoryLens.money}에서 ${rank.application[1]}`,
+    },
+    health: {
+      upright: `${suit.categoryLens.health}을 살피며 ${rank.application[0]}`,
+      reversed: `${suit.categoryLens.health}을 살피며 ${rank.application[1]}`,
+    },
+  },
+  symbolism: [
+    { symbol: suit.suitSymbol[0], meaning: suit.suitSymbol[1] },
+    { symbol: rank.rankSymbol[0], meaning: rank.rankSymbol[1] },
+  ],
+  commonMistakes: [
+    `${suit.nameKo}의 분야만 보고 ${rank.nameKo}이 보여주는 과정과 속도를 놓치는 것`,
+  ],
+  visual: { glyph: suit.glyph, accent: suit.accent },
+});
+
+export const minorArcana = minorSuits.flatMap((suit) =>
+  minorRanks.map((rank) => makeMinorCard(suit, rank)),
+);
+
+export const allCards = [...majorArcana, ...minorArcana];
+
 export function getCard(cardId: string) {
-  return majorArcana.find((card) => card.id === cardId);
+  return allCards.find((card) => card.id === cardId);
 }

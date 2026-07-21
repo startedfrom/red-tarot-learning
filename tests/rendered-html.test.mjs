@@ -40,6 +40,8 @@ test("renders the Red Tarot home instead of the starter", async () => {
   assert.match(html, /재물/);
   assert.match(html, /건강/);
   assert.match(html, /최근 헷갈린 카드/);
+  assert.match(html, /78장/);
+  assert.match(html, /150세트/);
   assert.doesNotMatch(
     html,
     /Your site is taking shape|codex-preview|react-loading-skeleton/i,
@@ -91,6 +93,15 @@ test("renders the full three-card lesson structure", async () => {
   assert.match(html, /카드별 힌트/);
   assert.match(html, /종합 해설/);
   assert.doesNotMatch(html, /질병이다|임신이다|치료된다/);
+});
+
+test("renders one-card and five-card learning sets", async () => {
+  const oneCardHtml = await (await render("/practice/love-one-001")).text();
+  const fiveCardHtml = await (await render("/practice/health-five-001")).text();
+
+  assert.match(oneCardHtml, /1장 배열/);
+  assert.match(fiveCardHtml, /5장 배열/);
+  assert.match(fiveCardHtml, /의료 전문가/);
 });
 
 test("renders a recovery view for an unknown lesson", async () => {

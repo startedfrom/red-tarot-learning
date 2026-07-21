@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { majorArcana } from "../app/data/cards";
-import {
-  learningSets,
-  supportCards,
-} from "../app/data/learning-sets";
+import { allCards, majorArcana, minorArcana } from "../app/data/cards";
+import { learningSets } from "../app/data/learning-sets";
 
 test("contains 22 unique major arcana cards", () => {
   assert.equal(majorArcana.length, 22);
@@ -15,8 +12,14 @@ test("contains 22 unique major arcana cards", () => {
   );
 });
 
+test("contains all 78 tarot cards", () => {
+  assert.equal(minorArcana.length, 56);
+  assert.equal(allCards.length, 78);
+  assert.equal(new Set(allCards.map((card) => card.id)).size, 78);
+});
+
 test("every card has complete learning content", () => {
-  for (const card of majorArcana) {
+  for (const card of allCards) {
     assert.ok(card.nameKo && card.nameEn && card.coreVerb && card.coreMeaning);
     assert.ok(card.keywords.length >= 4);
     assert.ok(
@@ -32,15 +35,24 @@ test("every card has complete learning content", () => {
   }
 });
 
-test("contains ten complete love three-card lessons", () => {
-  assert.equal(learningSets.length, 10);
+test("contains 150 complete learning sets", () => {
+  assert.equal(learningSets.length, 150);
+  assert.equal(new Set(learningSets.map((lesson) => lesson.id)).size, 150);
+
+  for (const category of ["love", "money", "health"] as const) {
+    const categorySets = learningSets.filter(
+      (lesson) => lesson.category === category,
+    );
+    assert.equal(categorySets.length, 50);
+    assert.equal(categorySets.filter((lesson) => lesson.cards.length === 1).length, 10);
+    assert.equal(categorySets.filter((lesson) => lesson.cards.length === 3).length, 25);
+    assert.equal(categorySets.filter((lesson) => lesson.cards.length === 5).length, 15);
+  }
 
   for (const lesson of learningSets) {
-    assert.equal(lesson.category, "love");
-    assert.equal(lesson.cards.length, 3);
-    assert.equal(lesson.spread.positions.length, 3);
-    assert.equal(lesson.cardAnalysis.length, 3);
-    assert.equal(lesson.positionAnalysis.length, 3);
+    assert.equal(lesson.cards.length, lesson.spread.positions.length);
+    assert.equal(lesson.cardAnalysis.length, lesson.cards.length);
+    assert.equal(lesson.positionAnalysis.length, lesson.cards.length);
     assert.equal(lesson.quiz.options.length, 4);
     assert.ok(
       lesson.fullInterpretation &&
@@ -51,13 +63,21 @@ test("contains ten complete love three-card lessons", () => {
 });
 
 test("every lesson card id resolves", () => {
-  const knownIds = new Set(
-    [...majorArcana, ...supportCards].map((card) => card.id),
-  );
+  const knownIds = new Set(allCards.map((card) => card.id));
 
   for (const lesson of learningSets) {
     for (const card of lesson.cards) {
       assert.ok(knownIds.has(card.cardId), card.cardId);
     }
   }
+});
+
+test("health learning content never claims a diagnosis", () => {
+  const healthCopy = learningSets
+    .filter((lesson) => lesson.category === "health")
+    .map((lesson) => JSON.stringify(lesson))
+    .join(" ");
+
+  assert.doesNotMatch(healthCopy, /질병이다|임신이다|치료된다|진단한다/);
+  assert.match(healthCopy, /의료 전문가/);
 });

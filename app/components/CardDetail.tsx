@@ -10,11 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import {
-  majorArcana,
-  type Category,
-  type TarotCard,
-} from "../data/cards";
+import { allCards, type Category, type TarotCard } from "../data/cards";
 import {
   safeReadProgress,
   safeWriteProgress,
@@ -36,10 +32,10 @@ export function CardDetail({ card }: { card: TarotCard }) {
   const [favorite, setFavorite] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const cardIndex = majorArcana.findIndex((item) => item.id === card.id);
+  const cardIndex = allCards.findIndex((item) => item.id === card.id);
   const previousCard =
-    majorArcana[(cardIndex - 1 + majorArcana.length) % majorArcana.length];
-  const nextCard = majorArcana[(cardIndex + 1) % majorArcana.length];
+    allCards[(cardIndex - 1 + allCards.length) % allCards.length];
+  const nextCard = allCards[(cardIndex + 1) % allCards.length];
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -90,7 +86,7 @@ export function CardDetail({ card }: { card: TarotCard }) {
       <div className="detail-breadcrumb">
         <Link href="/">홈</Link>
         <span aria-hidden="true">›</span>
-        <span>메이저 아르카나</span>
+        <span>{card.arcana === "major" ? "메이저 아르카나" : "마이너 아르카나"}</span>
         <span aria-hidden="true">›</span>
         <strong>{card.nameKo}</strong>
       </div>
@@ -103,7 +99,9 @@ export function CardDetail({ card }: { card: TarotCard }) {
           </span>
         </div>
         <div className="detail-heading">
-          <span className="eyebrow">MAJOR ARCANA · {card.number}</span>
+          <span className="eyebrow">
+            {card.arcana === "major" ? "MAJOR ARCANA" : "MINOR ARCANA"} · {card.number}
+          </span>
           <h1>{card.nameKo}</h1>
           <p className="english-name">{card.nameEn}</p>
           <div className="verb-card">

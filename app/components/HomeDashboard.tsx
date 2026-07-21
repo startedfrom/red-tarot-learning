@@ -7,13 +7,12 @@ import {
   Check,
   Flame,
   Heart,
-  LockKeyhole,
   PiggyBank,
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { majorArcana } from "../data/cards";
+import { allCards, majorArcana, type Category } from "../data/cards";
 import { getLessonCard, learningSets } from "../data/learning-sets";
 import {
   defaultProgress,
@@ -50,11 +49,11 @@ export function HomeDashboard() {
   );
 
   const masteredCardIds = useMemo(() => {
-    const majorIds = new Set(majorArcana.map((card) => card.id));
+    const cardIds = new Set(allCards.map((card) => card.id));
     return new Set(
       completedLessons
         .flatMap((lesson) => lesson.cards.map((item) => item.cardId))
-        .filter((id) => majorIds.has(id)),
+        .filter((id) => cardIds.has(id)),
     );
   }, [completedLessons]);
 
@@ -75,15 +74,22 @@ export function HomeDashboard() {
       .slice(0, 3);
   }, [progress.wrongLessonIds]);
 
-  const favoriteCards = majorArcana
+  const favoriteCards = allCards
     .filter((card) => progress.favoriteCardIds.includes(card.id))
     .slice(0, 3);
 
   const continueLesson =
     learningSets.find((lesson) => lesson.id === progress.lastLessonId) ??
     firstLesson;
-  const lovePercent = Math.round((completedLessons.length / learningSets.length) * 100);
-  const masteryPercent = Math.round((masteredCardIds.size / majorArcana.length) * 100);
+  const categoryProgress = (category: Category) => {
+    const total = learningSets.filter((lesson) => lesson.category === category).length;
+    const completed = completedLessons.filter((lesson) => lesson.category === category).length;
+    return { completed, percent: Math.round((completed / total) * 100) };
+  };
+  const loveProgress = categoryProgress("love");
+  const moneyProgress = categoryProgress("money");
+  const healthProgress = categoryProgress("health");
+  const masteryPercent = Math.round((masteredCardIds.size / allCards.length) * 100);
 
   return (
     <div className="home-dashboard">
@@ -101,7 +107,7 @@ export function HomeDashboard() {
             오늘은 &lsquo;선택&rsquo;을
             <br /> 배워봐요.
           </h1>
-          <p>정답을 외우지 않고 카드 사이의 문장을 읽는 연습이에요.</p>
+          <p>78장 카드 · 연애·재물·건강 150세트를 연결해 읽어요.</p>
         </div>
         <div className="streak-chip">
           <Flame aria-hidden="true" />
@@ -157,30 +163,34 @@ export function HomeDashboard() {
               <Heart aria-hidden="true" />
             </div>
             <span>연애</span>
-            <strong>{lovePercent}%</strong>
-            <div className="progress-track" aria-label={`연애 진도 ${lovePercent}%`}>
-              <span style={{ width: `${lovePercent}%` }} />
+            <strong>{loveProgress.percent}%</strong>
+            <div className="progress-track" aria-label={`연애 진도 ${loveProgress.percent}%`}>
+              <span style={{ width: `${loveProgress.percent}%` }} />
             </div>
-            <small>{completedLessons.length}/10 세트 완료</small>
+            <small>{loveProgress.completed}/50 세트 완료</small>
           </article>
-          <article className="subject-card subject-money is-locked">
+          <Link className="subject-card subject-money" href="/practice/money-one-001">
             <div className="subject-icon">
               <PiggyBank aria-hidden="true" />
             </div>
             <span>재물</span>
-            <strong>준비 중</strong>
-            <LockKeyhole className="lock-icon" aria-label="아직 준비 중" />
-            <small>다음 정원에서 만나요</small>
-          </article>
-          <article className="subject-card subject-health is-locked">
+            <strong>{moneyProgress.percent}%</strong>
+            <div className="progress-track" aria-label={`재물 진도 ${moneyProgress.percent}%`}>
+              <span style={{ width: `${moneyProgress.percent}%` }} />
+            </div>
+            <small>{moneyProgress.completed}/50 세트 완료</small>
+          </Link>
+          <Link className="subject-card subject-health" href="/practice/health-one-001">
             <div className="subject-icon">
               <Activity aria-hidden="true" />
             </div>
             <span>건강</span>
-            <strong>준비 중</strong>
-            <LockKeyhole className="lock-icon" aria-label="아직 준비 중" />
-            <small>생활 습관 학습으로 준비 중</small>
-          </article>
+            <strong>{healthProgress.percent}%</strong>
+            <div className="progress-track" aria-label={`건강 진도 ${healthProgress.percent}%`}>
+              <span style={{ width: `${healthProgress.percent}%` }} />
+            </div>
+            <small>{healthProgress.completed}/50 세트 완료</small>
+          </Link>
         </div>
       </section>
 

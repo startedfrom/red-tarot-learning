@@ -36,8 +36,8 @@ export function AppShell({
             <span>빨강타로</span>
           </Link>
           <div className="header-links" aria-label="빠른 메뉴">
-            <Link href="/cards/the-fool">22장 카드책</Link>
-            <Link href="/practice/love-three-001">3장 연습</Link>
+            <Link href="/cards/the-fool">78장 카드책</Link>
+            <Link href="/practice/love-three-001">150세트 연습</Link>
           </div>
           <span className="profile-dot" aria-label="내 학습 기록">
             나
