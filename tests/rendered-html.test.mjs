@@ -46,6 +46,17 @@ test("renders the Red Tarot home instead of the starter", async () => {
   );
 });
 
+test("publishes site-specific social sharing metadata", async () => {
+  const response = await render("/");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /property="og:title" content="빨강타로/);
+  assert.match(html, /property="og:image" content="http:\/\/localhost\/og\.png"/);
+  assert.match(html, /name="twitter:card" content="summary_large_image"/);
+  assert.match(html, /name="twitter:image" content="http:\/\/localhost\/og\.png"/);
+});
+
 test("renders a complete card detail", async () => {
   const response = await render("/cards/the-lovers");
   const html = await response.text();
@@ -79,6 +90,7 @@ test("renders the full three-card lesson structure", async () => {
   assert.match(html, /내 해석/);
   assert.match(html, /카드별 힌트/);
   assert.match(html, /종합 해설/);
+  assert.doesNotMatch(html, /질병이다|임신이다|치료된다/);
 });
 
 test("renders a recovery view for an unknown lesson", async () => {

@@ -30,11 +30,15 @@ export function HomeDashboard() {
   const [storageAvailable, setStorageAvailable] = useState(true);
 
   useEffect(() => {
-    try {
-      setProgress(safeReadProgress(window.localStorage));
-    } catch {
-      setStorageAvailable(false);
-    }
+    const timer = window.setTimeout(() => {
+      try {
+        setProgress(safeReadProgress(window.localStorage));
+      } catch {
+        setStorageAvailable(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   const completedLessons = useMemo(

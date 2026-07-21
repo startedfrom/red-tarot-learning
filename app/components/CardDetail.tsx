@@ -42,12 +42,16 @@ export function CardDetail({ card }: { card: TarotCard }) {
   const nextCard = majorArcana[(cardIndex + 1) % majorArcana.length];
 
   useEffect(() => {
-    try {
-      const progress = safeReadProgress(window.localStorage);
-      setFavorite(progress.favoriteCardIds.includes(card.id));
-    } catch {
-      setSaveMessage("이 브라우저에서는 즐겨찾기를 저장할 수 없어요.");
-    }
+    const timer = window.setTimeout(() => {
+      try {
+        const progress = safeReadProgress(window.localStorage);
+        setFavorite(progress.favoriteCardIds.includes(card.id));
+      } catch {
+        setSaveMessage("이 브라우저에서는 즐겨찾기를 저장할 수 없어요.");
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [card.id]);
 
   function handleFavorite() {
