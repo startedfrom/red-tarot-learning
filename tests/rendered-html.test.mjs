@@ -29,6 +29,11 @@ test("renders the Red Tarot home instead of the starter", async () => {
   assert.equal(response.status, 200);
   assert.match(html, /빨강타로/);
   assert.match(html, /오늘은/);
+  assert.match(html, /홈/);
+  assert.match(html, /카드/);
+  assert.match(html, /연습/);
+  assert.match(html, /복습/);
+  assert.match(html, /lang="ko"/);
   assert.doesNotMatch(
     html,
     /Your site is taking shape|codex-preview|react-loading-skeleton/i,
