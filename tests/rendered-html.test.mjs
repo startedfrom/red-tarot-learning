@@ -67,3 +67,25 @@ test("renders a recovery view for an unknown card", async () => {
   assert.match(html, /카드를 찾지 못했어요/);
   assert.match(html, /바보 카드부터 보기/);
 });
+
+test("renders the full three-card lesson structure", async () => {
+  const response = await render("/practice/love-three-001");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /현재 관계/);
+  assert.match(html, /상대의 태도/);
+  assert.match(html, /향후 흐름/);
+  assert.match(html, /내 해석/);
+  assert.match(html, /카드별 힌트/);
+  assert.match(html, /종합 해설/);
+});
+
+test("renders a recovery view for an unknown lesson", async () => {
+  const response = await render("/practice/not-a-lesson");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /학습 세트를 찾지 못했어요/);
+  assert.match(html, /첫 학습 시작/);
+});
