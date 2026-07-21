@@ -464,6 +464,414 @@ a {
   line-height: 1.65;
 }
 
+.home-dashboard {
+  display: grid;
+  gap: 26px;
+  padding: 24px 0 54px;
+}
+
+.storage-message {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #f0b4bd;
+  border-radius: var(--radius-md);
+  background: #fff1f3;
+  color: #963445;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.home-greeting {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 3px 0;
+}
+
+.home-greeting h1 {
+  margin: 9px 0 8px;
+  font-size: clamp(2.25rem, 10vw, 4.9rem);
+  line-height: 1.08;
+  letter-spacing: -0.075em;
+}
+
+.home-greeting p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.7;
+}
+
+.streak-chip,
+.mastery-chip,
+.count-badge,
+.soft-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.streak-chip {
+  flex: 0 0 auto;
+  padding: 9px 11px;
+  background: #fff0c9;
+  color: #80521b;
+}
+
+.streak-chip svg {
+  width: 16px;
+  height: 16px;
+  fill: var(--sun);
+  color: var(--apricot);
+}
+
+.daily-study-card {
+  position: relative;
+  display: grid;
+  align-items: center;
+  gap: 28px;
+  overflow: hidden;
+  padding: 28px 22px;
+  border: 1px solid #ffc6cf;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 90% 18%, rgba(255, 255, 255, 0.68), transparent 12rem),
+    var(--blush);
+  box-shadow: var(--shadow-soft);
+}
+
+.daily-study-card::before,
+.daily-study-card::after {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.32);
+  content: "";
+}
+
+.daily-study-card::before {
+  top: -44px;
+  right: -36px;
+  width: 150px;
+  height: 150px;
+}
+
+.daily-study-card::after {
+  bottom: -75px;
+  left: 34%;
+  width: 180px;
+  height: 180px;
+}
+
+.daily-card-visual,
+.daily-card-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.daily-card-visual {
+  display: grid;
+  place-items: center;
+}
+
+.floating-sticker {
+  position: absolute;
+  top: 7%;
+  right: 7%;
+  color: var(--cherry);
+  font-size: 2rem;
+  transform: rotate(12deg);
+}
+
+.soft-pill {
+  padding: 6px 10px;
+  background: var(--paper);
+  color: var(--cherry-dark);
+}
+
+.daily-card-copy h2 {
+  margin: 12px 0 4px;
+  font-size: clamp(2rem, 10vw, 3.8rem);
+  letter-spacing: -0.065em;
+}
+
+.daily-card-copy > p {
+  max-width: 520px;
+  margin: 0;
+  color: #745b60;
+  line-height: 1.75;
+}
+
+.daily-card-copy .daily-verb {
+  margin-bottom: 14px;
+  color: var(--cherry-dark);
+  font-weight: 850;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.button-row svg {
+  width: 18px;
+}
+
+.home-section {
+  padding: 22px 0;
+}
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 15px;
+}
+
+.section-heading h2,
+.continue-section h2 {
+  margin: 6px 0 0;
+  font-size: clamp(1.4rem, 6vw, 2.2rem);
+  letter-spacing: -0.055em;
+}
+
+.mastery-chip {
+  padding: 8px 11px;
+  background: var(--paper);
+  box-shadow: 0 8px 22px rgba(83, 43, 46, 0.08);
+  color: var(--muted);
+}
+
+.mastery-chip strong {
+  color: var(--cherry-dark);
+}
+
+.subject-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.subject-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 11px;
+  min-height: 122px;
+  padding: 17px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--paper);
+}
+
+.subject-card > span {
+  font-weight: 850;
+}
+
+.subject-card > strong {
+  font-size: 1rem;
+}
+
+.subject-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 15px;
+}
+
+.subject-icon svg {
+  width: 21px;
+}
+
+.subject-love .subject-icon {
+  background: var(--blush);
+  color: var(--cherry);
+}
+
+.subject-money .subject-icon {
+  background: #fff0c9;
+  color: #a66d18;
+}
+
+.subject-health .subject-icon {
+  background: #e3f3ed;
+  color: var(--success);
+}
+
+.progress-track {
+  grid-column: 1 / -1;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f3e8e4;
+}
+
+.progress-track span {
+  display: block;
+  min-width: 4px;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--cherry);
+}
+
+.subject-card small {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.subject-card.is-locked {
+  opacity: 0.72;
+}
+
+.lock-icon {
+  width: 17px;
+  color: var(--muted);
+}
+
+.continue-section {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  border: 1px solid #f1d58d;
+  border-radius: 24px;
+  background: #fff0c9;
+}
+
+.continue-section h2 {
+  font-size: 1.15rem;
+}
+
+.continue-section p {
+  margin: 7px 0 0;
+  color: #7e5b28;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.continue-icon,
+.circle-link,
+.empty-pocket-icon {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.continue-icon {
+  width: 46px;
+  height: 46px;
+  background: var(--paper);
+  color: var(--cherry);
+}
+
+.continue-icon svg,
+.circle-link svg {
+  width: 20px;
+}
+
+.circle-link {
+  width: 43px;
+  height: 43px;
+  background: var(--ink);
+  color: white;
+}
+
+.count-badge {
+  padding: 7px 10px;
+  background: var(--blush);
+  color: var(--cherry-dark);
+}
+
+.empty-pocket {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1px dashed #dfc9c1;
+  border-radius: 20px;
+  background: rgba(255, 253, 249, 0.62);
+}
+
+.empty-pocket-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  background: #e5f5ef;
+  color: var(--success);
+}
+
+.empty-pocket-icon svg {
+  width: 21px;
+}
+
+.empty-pocket strong {
+  font-size: 0.92rem;
+}
+
+.empty-pocket p,
+.favorites-empty {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.mini-card-list {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px 4px 18px;
+}
+
+.mini-card-list > a {
+  display: grid;
+  justify-items: center;
+  gap: 9px;
+  flex: 0 0 120px;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.favorites-section {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--paper);
+}
+
+.favorites-section .section-heading svg {
+  color: var(--cherry);
+}
+
+.favorite-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.favorite-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--blush);
+  color: var(--cherry-dark);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
 @media (min-width: 840px) {
   .app-shell {
     padding-right: 28px;
@@ -493,6 +901,45 @@ a {
 
   .shell-preview .tarot-visual {
     justify-self: center;
+  }
+
+  .home-dashboard {
+    gap: 34px;
+    padding: 44px 5vw 90px;
+  }
+
+  .daily-study-card {
+    grid-template-columns: minmax(250px, 0.72fr) minmax(0, 1.2fr);
+    padding: 42px 6vw;
+  }
+
+  .subject-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .subject-card {
+    display: flex;
+    min-height: 190px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .subject-card > strong {
+    font-size: 1.25rem;
+  }
+
+  .progress-track,
+  .subject-card small {
+    width: 100%;
+    margin-top: auto;
+  }
+
+  .continue-section {
+    padding: 25px 28px;
+  }
+
+  .continue-section h2 {
+    font-size: 1.35rem;
   }
 }
 
