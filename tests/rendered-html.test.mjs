@@ -72,6 +72,20 @@ test("renders a complete card detail", async () => {
   assert.match(html, /상징/);
 });
 
+test("renders a searchable 78-card library", async () => {
+  const response = await render("/cards");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /78장 카드 도감/);
+  assert.match(html, /카드 이름, 영문명, 키워드 검색/);
+  assert.match(html, /메이저/);
+  assert.match(html, /완드/);
+  assert.match(html, /컵/);
+  assert.match(html, /소드/);
+  assert.match(html, /펜타클/);
+});
+
 test("renders a recovery view for an unknown card", async () => {
   const response = await render("/cards/not-a-card");
   const html = await response.text();

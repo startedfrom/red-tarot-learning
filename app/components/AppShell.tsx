@@ -5,7 +5,7 @@ type ActiveSection = "home" | "cards" | "practice" | "review";
 
 const navItems = [
   { id: "home", label: "홈", href: "/", Icon: Home },
-  { id: "cards", label: "카드", href: "/cards/the-fool", Icon: BookOpen },
+  { id: "cards", label: "카드", href: "/cards", Icon: BookOpen },
   {
     id: "practice",
     label: "연습",
@@ -36,7 +36,7 @@ export function AppShell({
             <span>빨강타로</span>
           </Link>
           <div className="header-links" aria-label="빠른 메뉴">
-            <Link href="/cards/the-fool">78장 카드책</Link>
+            <Link href="/cards">78장 카드책</Link>
             <Link href="/practice/love-three-001">150세트 연습</Link>
           </div>
           <span className="profile-dot" aria-label="내 학습 기록">

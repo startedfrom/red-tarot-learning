@@ -64,6 +64,17 @@ a {
   outline-offset: 3px;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .skip-link {
   position: fixed;
   top: 12px;
@@ -908,6 +919,200 @@ a {
 
 .card-detail {
   padding: 14px 0 58px;
+}
+
+.card-library {
+  display: grid;
+  gap: 16px;
+  padding: 18px 0 76px;
+}
+
+.library-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.library-heading h1 {
+  margin: 5px 0 2px;
+  font-size: clamp(2rem, 9vw, 4rem);
+  letter-spacing: -0.07em;
+}
+
+.library-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.library-count {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 18px;
+  background: var(--blush);
+  color: var(--cherry-dark);
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1;
+  transform: rotate(3deg);
+}
+
+.library-count small {
+  font-size: 0.58rem;
+}
+
+.library-tools {
+  display: grid;
+  gap: 8px;
+}
+
+.card-search {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  gap: 9px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--paper);
+}
+
+.card-search svg {
+  width: 18px;
+  color: var(--cherry);
+}
+
+.card-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 0.8rem;
+}
+
+.card-search input::placeholder {
+  color: #ad9699;
+}
+
+.card-filters {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.card-filters button {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: rgba(255, 253, 249, 0.7);
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.card-filters button.is-active {
+  border-color: #ffc0c9;
+  background: var(--blush);
+  color: var(--cherry-dark);
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.library-card {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 62px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 253, 249, 0.82);
+}
+
+.library-card .tarot-visual {
+  width: 62px;
+  filter: drop-shadow(0 8px 12px rgba(124, 40, 52, 0.12));
+}
+
+.library-card > span {
+  min-width: 0;
+}
+
+.library-card strong,
+.library-card small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.library-card strong {
+  font-size: 0.82rem;
+}
+
+.library-card small {
+  margin-top: 4px;
+  color: var(--cherry-dark);
+  font-size: 0.66rem;
+}
+
+.library-empty {
+  display: grid;
+  min-height: 240px;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  border: 1px dashed var(--line);
+  border-radius: 22px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.library-empty strong {
+  color: var(--ink);
+}
+
+.library-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.library-pagination button {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--paper);
+  cursor: pointer;
+}
+
+.library-pagination button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.library-pagination svg {
+  width: 17px;
+}
+
+.library-pagination span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
 }
 
 .detail-breadcrumb {
@@ -2069,6 +2274,90 @@ a {
 
   .card-detail {
     padding: 24px 5vw 92px;
+  }
+
+  .card-library {
+    height: 100%;
+    min-height: 0;
+    grid-template-rows: auto auto minmax(0, 1fr) 38px;
+    gap: 8px;
+    padding: 5px 0 0;
+    overflow: hidden;
+  }
+
+  .library-heading {
+    align-items: center;
+  }
+
+  .library-heading h1 {
+    margin: 2px 0 0;
+    font-size: 1.65rem;
+  }
+
+  .library-heading p {
+    font-size: 0.7rem;
+  }
+
+  .library-count {
+    width: 44px;
+    height: 44px;
+    border-radius: 15px;
+    font-size: 0.95rem;
+  }
+
+  .library-tools {
+    grid-template-columns: minmax(210px, 0.7fr) minmax(0, 1.3fr);
+  }
+
+  .card-search {
+    min-height: 40px;
+  }
+
+  .card-filters {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .card-filters button {
+    min-height: 40px;
+    padding: 0 5px;
+    font-size: 0.66rem;
+  }
+
+  .library-grid {
+    min-height: 0;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    overflow: hidden;
+  }
+
+  .library-card {
+    grid-template-columns: minmax(48px, 0.42fr) minmax(0, 0.58fr);
+    gap: 7px;
+    padding: 7px;
+    border-radius: 15px;
+  }
+
+  .library-card .tarot-visual {
+    width: min(62px, 7.4vh);
+    justify-self: center;
+  }
+
+  .library-card strong {
+    font-size: 0.72rem;
+  }
+
+  .library-card small {
+    font-size: 0.58rem;
+  }
+
+  .library-pagination {
+    height: 38px;
+  }
+
+  .library-pagination button {
+    width: 34px;
+    height: 34px;
   }
 
   .card-detail-hero {
