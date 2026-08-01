@@ -40,6 +40,18 @@ export function AppShell({
 
         <main id="main-content">{children}</main>
 
+        <footer className="site-footer">
+          <nav aria-label="서비스 정보">
+            <Link href="/about">소개</Link>
+            <Link href="/editorial-policy">콘텐츠 기준</Link>
+            <Link href="/privacy">개인정보</Link>
+            <Link href="/terms">이용약관</Link>
+            <Link href="/disclaimer">해석의 한계</Link>
+            <Link href="/contact">문의</Link>
+          </nav>
+          <p>타로 설명은 학습과 자기성찰을 위한 참고 자료이며 의료·법률·재무 판단을 대신하지 않습니다.</p>
+        </footer>
+
         <nav className="bottom-nav" aria-label="주요 메뉴">
           {navItems.map(({ id, label, href, Icon }) => (
             <Link

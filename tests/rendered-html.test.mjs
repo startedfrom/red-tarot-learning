@@ -203,3 +203,20 @@ test("returns 404 for an unknown guide", async () => {
   const response = await render("/guides/not-a-guide");
   assert.equal(response.status, 404);
 });
+
+test("publishes complete trust and policy pages", async () => {
+  const expectations = new Map([
+    ["/about", "빨강타로 소개"],
+    ["/editorial-policy", "콘텐츠 작성 기준"],
+    ["/privacy", "개인정보처리방침"],
+    ["/terms", "이용약관"],
+    ["/disclaimer", "타로 해석의 한계"],
+    ["/contact", "문의하기"],
+  ]);
+  for (const [pathname, heading] of expectations) {
+    const response = await render(pathname);
+    const html = await response.text();
+    assert.equal(response.status, 200);
+    assert.match(html, new RegExp(heading));
+  }
+});

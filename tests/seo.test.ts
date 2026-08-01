@@ -6,10 +6,13 @@ import sitemap from "../app/sitemap";
 test("sitemap contains only public canonical content", () => {
   process.env.NEXT_PUBLIC_SITE_URL = "https://redtarot.example";
   const urls = sitemap().map((entry) => entry.url);
-  assert.equal(urls.length, 1 + 1 + 78 + 1 + 30 + 1 + 3);
+  assert.equal(urls.length, 1 + 1 + 78 + 1 + 30 + 1 + 3 + 6);
   assert.ok(urls.includes("https://redtarot.example/cards/the-lovers"));
   assert.ok(urls.includes("https://redtarot.example/readings/love-three-001"));
   assert.ok(urls.includes("https://redtarot.example/guides/upright-and-reversed"));
+  for (const path of ["/about", "/editorial-policy", "/privacy", "/terms", "/disclaimer", "/contact"]) {
+    assert.ok(urls.includes(`https://redtarot.example${path}`));
+  }
   assert.ok(!urls.some((url) => url.includes("/practice/")));
   assert.ok(!urls.some((url) => url.includes("/me")));
 });
