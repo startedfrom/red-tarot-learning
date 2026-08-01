@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { allCards, majorArcana, minorArcana } from "../app/data/cards";
+import { guides } from "../app/data/guides";
 import { learningSets } from "../app/data/learning-sets";
+import { publicReadings } from "../app/lib/public-content";
 
 test("contains 22 unique major arcana cards", () => {
   assert.equal(majorArcana.length, 22);
@@ -80,4 +82,16 @@ test("health learning content never claims a diagnosis", () => {
 
   assert.doesNotMatch(healthCopy, /질병이다|임신이다|치료된다|진단한다/);
   assert.match(healthCopy, /의료 전문가/);
+});
+
+test("public guides and readings reference known cards", () => {
+  const knownIds = new Set(allCards.map((card) => card.id));
+
+  for (const guide of guides) {
+    for (const cardId of guide.relatedCardIds) assert.ok(knownIds.has(cardId));
+  }
+
+  for (const reading of publicReadings) {
+    for (const item of reading.cards) assert.ok(knownIds.has(item.cardId));
+  }
 });
