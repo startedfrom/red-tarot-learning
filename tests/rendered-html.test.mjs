@@ -52,6 +52,26 @@ test("keeps the local learning dashboard at /me", async () => {
   assert.match(html, /name="robots" content="noindex, nofollow"/);
 });
 
+test("renders Google Kakao and email login with a no-config recovery path", async () => {
+  const response = await render("/login?next=%2Fme");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /로그인하고 학습 기록 저장하기/);
+  assert.match(html, /Google로 계속하기/);
+  assert.match(html, /Kakao로 계속하기/);
+  assert.match(html, /이메일로 코드 받기/);
+  assert.match(html, /운영 연결 준비 중/);
+  assert.match(html, /로그인하지 않고 계속 학습/);
+  assert.match(html, /name="robots" content="noindex, nofollow"/);
+});
+
+test("offers a login entry from the global header", async () => {
+  const html = await (await render("/cards")).text();
+  assert.match(html, /href="\/login\?next=%2Fme"/);
+  assert.match(html, />로그인</);
+});
+
 test("uses the homepage card filter query on first render", async () => {
   const response = await render("/cards?type=major");
   const html = await response.text();

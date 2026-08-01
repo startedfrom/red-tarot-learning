@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BookOpen, Home, Layers3, UserRound } from "lucide-react";
+import { AuthStatus } from "./AuthStatus";
 
 type ActiveSection = "home" | "cards" | "readings" | "practice" | "me";
 
@@ -35,7 +36,7 @@ export function AppShell({
             <Link href="/readings">조합 예제</Link>
             <Link href="/guides">기초 가이드</Link>
           </div>
-          <Link className="profile-dot" href="/me" aria-label="내 학습 기록">나</Link>
+          <AuthStatus />
         </header>
 
         <main id="main-content">{children}</main>
