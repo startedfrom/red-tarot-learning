@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { handleAuthCallback } from "../app/lib/auth-callback";
 import {
   AUTH_ERROR_MESSAGES,
   authErrorMessage,
@@ -94,6 +95,12 @@ test("allows only same-site relative return paths including query and hash", () 
   assert.equal(safeReturnPath("/"), "/");
   assert.equal(safeReturnPath("/me?tab=cards#saved"), "/me?tab=cards#saved");
   assert.equal(safeReturnPath("/cards/the-star?q=love"), "/cards/the-star?q=love");
+  assert.equal(
+    safeReturnPath(
+      "/카드/별?q=https%3A%2F%2Fevil.example%2F..%2Fauth%2Fcallback#정방향",
+    ),
+    "/%EC%B9%B4%EB%93%9C/%EB%B3%84?q=https%3A%2F%2Fevil.example%2F..%2Fauth%2Fcallback#%EC%A0%95%EB%B0%A9%ED%96%A5",
+  );
 });
 
 test("rejects protocol URLs, slash tricks, backslashes, and encoded controls", () => {
@@ -101,9 +108,18 @@ test("rejects protocol URLs, slash tricks, backslashes, and encoded controls", (
     "https://evil.example/me",
     "javascript:alert(1)",
     "//evil.example/me",
+    "/https://evil.example/me",
+    "/http:/evil.example/me",
     "\\\\evil.example\\me",
     "/\\evil.example/me",
     "/%5cevil.example/me",
+    "/./me",
+    "/foo/../me",
+    "/foo/%2e%2e/me",
+    "/foo/%252e%252e/auth/callback",
+    "/%2561uth/callback",
+    "/%25252561uth/callback",
+    "/%2568ttps%253a%252f%252fevil.example/me",
     "/foo/..//evil.example/me",
     "/%2e%2e//evil.example/me",
     "/me%0aSet-Cookie:bad",
@@ -168,18 +184,123 @@ test("maps stable auth codes to Korean messages without leaking provider errors"
   assert.doesNotMatch(fallback, /invalid_grant|provider|secret/i);
 });
 
-test("callback exchanges a code and exposes only stable redirect errors", () => {
+test("callback route delegates to the shared handler", () => {
   const route = readFileSync("app/auth/callback/route.ts", "utf8");
 
   assert.match(route, /export\s+async\s+function\s+GET\s*\(/);
-  assert.match(route, /new\s+URL\s*\(\s*request\.url\s*\)\.origin/);
-  assert.match(route, /searchParams\.get\s*\(\s*["']code["']\s*\)/);
-  assert.match(route, /exchangeCodeForSession\s*\(\s*code\s*\)/);
-  assert.match(route, /safeReturnPath\s*\(/);
-  assert.match(route, /error=config/);
-  assert.match(route, /error=missing_code/);
-  assert.match(route, /error=callback/);
-  assert.doesNotMatch(route, /error\.message|encodeURIComponent\s*\(\s*error/);
+  assert.match(route, /handleAuthCallback\s*\(/);
+  assert.match(route, /createServerSupabaseClient/);
+  assert.doesNotMatch(route, /exchangeCodeForSession/);
+});
+
+test("callback reports missing configuration without exchanging a code", async () => {
+  const response = await handleAuthCallback(
+    new Request("https://red-tarot.example/auth/callback?code=oauth-code"),
+    async () => null,
+  );
+
+  assert.equal(response.status, 307);
+  assert.equal(
+    response.headers.get("location"),
+    "https://red-tarot.example/login?error=config",
+  );
+});
+
+test("callback reports a missing code before attempting an exchange", async () => {
+  let exchangeCalls = 0;
+  const response = await handleAuthCallback(
+    new Request("https://red-tarot.example/auth/callback?next=/cards"),
+    async () => ({
+      auth: {
+        async exchangeCodeForSession() {
+          exchangeCalls += 1;
+          return { error: null };
+        },
+      },
+    }),
+  );
+
+  assert.equal(exchangeCalls, 0);
+  assert.equal(
+    response.headers.get("location"),
+    "https://red-tarot.example/login?error=missing_code",
+  );
+});
+
+test("callback maps a returned provider error to its stable code", async () => {
+  const rawProviderError = "invalid_grant: do not expose this";
+  const response = await handleAuthCallback(
+    new Request("https://red-tarot.example/auth/callback?code=oauth-code"),
+    async () => ({
+      auth: {
+        async exchangeCodeForSession() {
+          return { error: new Error(rawProviderError) };
+        },
+      },
+    }),
+  );
+  const location = response.headers.get("location");
+
+  assert.equal(location, "https://red-tarot.example/login?error=callback");
+  assert.doesNotMatch(location ?? "", /invalid_grant|do%20not%20expose/i);
+});
+
+test("callback maps a thrown provider error to its stable code", async () => {
+  const rawProviderError = "provider_transport_secret";
+  const response = await handleAuthCallback(
+    new Request("https://red-tarot.example/auth/callback?code=oauth-code"),
+    async () => ({
+      auth: {
+        async exchangeCodeForSession() {
+          throw new Error(rawProviderError);
+        },
+      },
+    }),
+  );
+  const location = response.headers.get("location");
+
+  assert.equal(location, "https://red-tarot.example/login?error=callback");
+  assert.doesNotMatch(location ?? "", /provider_transport_secret/i);
+});
+
+test("callback redirects a successful exchange to the safe next path", async () => {
+  let exchangedCode: string | null = null;
+  const response = await handleAuthCallback(
+    new Request(
+      "https://red-tarot.example/auth/callback?code=oauth-code&next=%2Fcards%2Fthe-star%3Ftab%3Dlove%23meaning",
+    ),
+    async () => ({
+      auth: {
+        async exchangeCodeForSession(code: string) {
+          exchangedCode = code;
+          return { error: null };
+        },
+      },
+    }),
+  );
+
+  assert.equal(exchangedCode, "oauth-code");
+  assert.equal(
+    response.headers.get("location"),
+    "https://red-tarot.example/cards/the-star?tab=love#meaning",
+  );
+});
+
+test("callback never redirects a successful exchange to an external-like path", async () => {
+  const response = await handleAuthCallback(
+    new Request(
+      "https://red-tarot.example/auth/callback?code=oauth-code&next=%2Fhttps%3A%2F%2Fevil.example",
+    ),
+    async () => ({
+      auth: {
+        async exchangeCodeForSession() {
+          return { error: null };
+        },
+      },
+    }),
+  );
+
+  assert.equal(response.headers.get("location"), "https://red-tarot.example/me");
 });
 
 test("signout is POST-only, signs out when configured, and validates next", () => {

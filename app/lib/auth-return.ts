@@ -1,6 +1,12 @@
 const DEFAULT_RETURN_PATH = "/me";
 const RETURN_PATH_ORIGIN = "https://return-path.invalid";
 const CONTROL_CHARACTER = /[\u0000-\u001f\u007f]/;
+const EXTERNAL_LIKE_PATH = /^\/[a-z][a-z\d+.-]*:/i;
+const ENCODED_CONTROL_CHARACTER =
+  /%(?:25)*(?:0[\da-f]|1[\da-f]|7f)/i;
+const ENCODED_PATH_SEPARATOR = /%(?:25)*(?:2f|5c)/i;
+const ENCODED_DOT_SEGMENT = /^(?:(?:%(?:25)*2e)|\.){1,2}$/i;
+const MAX_PATH_DECODE_PASSES = 3;
 const RESERVED_AUTH_PATHS = new Set(["/auth/callback", "/auth/signout"]);
 
 export const AUTH_ERROR_MESSAGES = {
@@ -16,14 +22,12 @@ export function safeReturnPath(value?: string | null): string {
     return DEFAULT_RETURN_PATH;
   }
 
-  const decodedValue = decodeRepeatedly(value);
-  if (
-    decodedValue === null ||
-    CONTROL_CHARACTER.test(decodedValue) ||
-    decodedValue.includes("\\") ||
-    !decodedValue.startsWith("/") ||
-    decodedValue.startsWith("//")
-  ) {
+  if (CONTROL_CHARACTER.test(value) || ENCODED_CONTROL_CHARACTER.test(value)) {
+    return DEFAULT_RETURN_PATH;
+  }
+
+  const rawPathname = value.split(/[?#]/, 1)[0];
+  if (!hasSafeDecodedPathnames(rawPathname)) {
     return DEFAULT_RETURN_PATH;
   }
 
@@ -65,31 +69,51 @@ export function authErrorMessage(code?: string | null): string | null {
   return AUTH_ERROR_MESSAGES.callback;
 }
 
-function decodeRepeatedly(value: string): string | null {
-  let decoded = value;
+function hasSafeDecodedPathnames(rawPathname: string): boolean {
+  let pathname = rawPathname;
 
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    let next: string;
+  for (let pass = 0; pass <= MAX_PATH_DECODE_PASSES; pass += 1) {
+    if (hasUnsafePathname(pathname)) return false;
+
+    let decodedPathname: string;
     try {
-      next = decodeURIComponent(decoded);
+      decodedPathname = decodeURIComponent(pathname);
     } catch {
-      return null;
+      return true;
     }
-    if (next === decoded) return next;
-    decoded = next;
+    if (decodedPathname === pathname) return true;
+    if (pass === MAX_PATH_DECODE_PASSES) return false;
+    pathname = decodedPathname;
   }
 
-  return null;
+  return true;
+}
+
+function hasUnsafePathname(pathname: string): boolean {
+  if (
+    CONTROL_CHARACTER.test(pathname) ||
+    !pathname.startsWith("/") ||
+    pathname.startsWith("//") ||
+    pathname.includes("\\") ||
+    EXTERNAL_LIKE_PATH.test(pathname) ||
+    ENCODED_PATH_SEPARATOR.test(pathname) ||
+    isReservedAuthPath(pathname)
+  ) {
+    return true;
+  }
+
+  return pathname.split("/").some((segment) => {
+    return (
+      segment === "." ||
+      segment === ".." ||
+      ENCODED_DOT_SEGMENT.test(segment)
+    );
+  });
 }
 
 function isReservedAuthPath(pathname: string): boolean {
-  const decodedPathname = decodeRepeatedly(pathname);
-  if (decodedPathname === null) return true;
-
   const normalizedPathname =
-    decodedPathname.length > 1
-      ? decodedPathname.replace(/\/+$/, "")
-      : decodedPathname;
+    pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
   for (const reservedPath of RESERVED_AUTH_PATHS) {
     if (
       normalizedPathname === reservedPath ||
