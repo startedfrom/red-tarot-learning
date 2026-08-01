@@ -175,3 +175,28 @@ test("marks interactive practice as noindex with a public canonical", async () =
   assert.match(html, /name="robots" content="noindex, follow"/);
   assert.match(html, /rel="canonical" href="http:\/\/localhost\/readings\/love-three-001"/);
 });
+
+test("renders the beginner guide directory", async () => {
+  const response = await render("/guides");
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /초보자 타로 가이드/);
+  assert.match(html, /정방향과 역방향/);
+  assert.match(html, /3장 배열/);
+  assert.match(html, /질문 만드는 법/);
+});
+
+test("renders a complete beginner guide", async () => {
+  const response = await render("/guides/upright-and-reversed");
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /다섯 가지 방식/);
+  assert.match(html, /차단/);
+  assert.match(html, /지연/);
+  assert.match(html, /관련 카드로 이어서 보기/);
+});
+
+test("returns 404 for an unknown guide", async () => {
+  const response = await render("/guides/not-a-guide");
+  assert.equal(response.status, 404);
+});
