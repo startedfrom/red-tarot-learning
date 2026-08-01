@@ -141,3 +141,37 @@ test("renders a recovery view for an unknown lesson", async () => {
   assert.match(html, /학습 세트를 찾지 못했어요/);
   assert.match(html, /첫 학습 시작/);
 });
+
+test("renders the curated reading directory", async () => {
+  const response = await render("/readings");
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /30개 조합 해석 예제/);
+  assert.match(html, /연애/);
+  assert.match(html, /재물/);
+  assert.match(html, /건강/);
+});
+
+test("renders a public reading with all interpretation evidence", async () => {
+  const response = await render("/readings/love-three-001");
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /이 관계의 현재 흐름은 어떻게 이어질까요/);
+  assert.match(html, /카드별 핵심 근거/);
+  assert.match(html, /위치에 맞춰 읽기/);
+  assert.match(html, /가능한 대안/);
+  assert.match(html, /달라지는 조건/);
+  assert.match(html, /같은 조합 직접 풀기/);
+});
+
+test("returns 404 for a reading outside the public registry", async () => {
+  const response = await render("/readings/love-five-015");
+  assert.equal(response.status, 404);
+});
+
+test("marks interactive practice as noindex with a public canonical", async () => {
+  const response = await render("/practice/love-three-001");
+  const html = await response.text();
+  assert.match(html, /name="robots" content="noindex, follow"/);
+  assert.match(html, /rel="canonical" href="http:\/\/localhost\/readings\/love-three-001"/);
+});

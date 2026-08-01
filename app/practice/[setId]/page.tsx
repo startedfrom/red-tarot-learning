@@ -7,10 +7,18 @@ import {
   getLessonCard,
 } from "../../data/learning-sets";
 import type { TarotCard } from "../../data/cards";
+import { getPublicReading } from "../../lib/public-content";
 
-export const metadata: Metadata = {
-  title: "3장 배열 연습",
-};
+export async function generateMetadata({ params }: { params: Promise<{ setId: string }> }): Promise<Metadata> {
+  const { setId } = await params;
+  const lesson = getLearningSet(setId);
+  const publicReading = getPublicReading(setId);
+  return {
+    title: lesson ? `${lesson.question} 연습` : "학습 세트를 찾지 못했어요",
+    robots: { index: false, follow: true },
+    alternates: publicReading ? { canonical: `/readings/${setId}` } : undefined,
+  };
+}
 
 export default async function PracticePage({
   params,
