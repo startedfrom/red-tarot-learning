@@ -220,3 +220,11 @@ test("publishes complete trust and policy pages", async () => {
     assert.match(html, new RegExp(heading));
   }
 });
+
+test("renders public content landmarks without duplicate h1 elements", async () => {
+  for (const pathname of ["/", "/cards/the-lovers", "/readings/love-three-001", "/guides/upright-and-reversed"]) {
+    const html = await (await render(pathname)).text();
+    assert.equal((html.match(/<h1/g) ?? []).length, 1, pathname);
+    assert.match(html, /id="main-content"/);
+  }
+});
