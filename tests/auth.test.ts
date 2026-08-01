@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { handleAuthCallback } from "../app/lib/auth-callback";
+import { handleAuthSignout } from "../app/lib/auth-signout";
 import {
   AUTH_ERROR_MESSAGES,
   authErrorMessage,
@@ -171,7 +172,13 @@ test("builds an encoded callback URL with a validated return path", () => {
 test("maps stable auth codes to Korean messages without leaking provider errors", () => {
   assert.equal(authErrorMessage(null), null);
 
-  for (const code of ["config", "missing_code", "callback"] as const) {
+  for (const code of [
+    "config",
+    "missing_code",
+    "callback",
+    "csrf",
+    "signout",
+  ] as const) {
     const message = authErrorMessage(code);
     assert.equal(message, AUTH_ERROR_MESSAGES[code]);
     assert.match(message, /[가-힣]/);
@@ -303,11 +310,128 @@ test("callback never redirects a successful exchange to an external-like path", 
   assert.equal(response.headers.get("location"), "https://red-tarot.example/me");
 });
 
-test("signout is POST-only, signs out when configured, and validates next", () => {
+test("signout route is POST-only and delegates to the shared handler", () => {
   const route = readFileSync("app/auth/signout/route.ts", "utf8");
 
   assert.match(route, /export\s+async\s+function\s+POST\s*\(/);
   assert.doesNotMatch(route, /export\s+(?:async\s+)?function\s+GET\s*\(/);
-  assert.match(route, /auth\.signOut\s*\(/);
-  assert.match(route, /safeReturnPath\s*\(/);
+  assert.match(route, /handleAuthSignout\s*\(/);
+  assert.match(route, /createServerSupabaseClient/);
+  assert.doesNotMatch(route, /auth\.signOut\s*\(/);
+});
+
+test("signout accepts a matching Origin and uses local scope", async () => {
+  let receivedOptions: unknown = null;
+  const response = await handleAuthSignout(
+    new Request(
+      "https://red-tarot.example/auth/signout?next=%2Fcards%2Fthe-star%3Ftab%3Dlove",
+      {
+        method: "POST",
+        headers: { Origin: "https://red-tarot.example" },
+      },
+    ),
+    async () => ({
+      auth: {
+        async signOut(options: unknown) {
+          receivedOptions = options;
+          return { error: null };
+        },
+      },
+    }),
+  );
+
+  assert.deepEqual(receivedOptions, { scope: "local" });
+  assert.equal(response.status, 303);
+  assert.equal(
+    response.headers.get("location"),
+    "https://red-tarot.example/cards/the-star?tab=love",
+  );
+});
+
+test("signout permits an absent Origin for same-site form and server submissions", async () => {
+  let signOutCalls = 0;
+  const response = await handleAuthSignout(
+    new Request("https://red-tarot.example/auth/signout?next=/cards", {
+      method: "POST",
+    }),
+    async () => ({
+      auth: {
+        async signOut() {
+          signOutCalls += 1;
+          return { error: null };
+        },
+      },
+    }),
+  );
+
+  assert.equal(signOutCalls, 1);
+  assert.equal(
+    response.headers.get("location"),
+    "https://red-tarot.example/cards",
+  );
+});
+
+test("signout rejects a mismatched Origin before creating a client", async () => {
+  let clientFactoryCalls = 0;
+  const response = await handleAuthSignout(
+    new Request("https://red-tarot.example/auth/signout?next=/cards", {
+      method: "POST",
+      headers: { Origin: "https://evil.example" },
+    }),
+    async () => {
+      clientFactoryCalls += 1;
+      return null;
+    },
+  );
+
+  assert.equal(clientFactoryCalls, 0);
+  assert.equal(
+    response.headers.get("location"),
+    "https://red-tarot.example/login?error=csrf",
+  );
+});
+
+test("signout safely redirects when optional Supabase config is absent", async () => {
+  const response = await handleAuthSignout(
+    new Request("https://red-tarot.example/auth/signout?next=//evil.example", {
+      method: "POST",
+    }),
+    async () => null,
+  );
+
+  assert.equal(response.headers.get("location"), "https://red-tarot.example/me");
+});
+
+test("signout maps a returned error to a stable user-safe code", async () => {
+  const response = await handleAuthSignout(
+    new Request("https://red-tarot.example/auth/signout", { method: "POST" }),
+    async () => ({
+      auth: {
+        async signOut() {
+          return { error: new Error("provider returned a secret error") };
+        },
+      },
+    }),
+  );
+  const location = response.headers.get("location");
+
+  assert.equal(location, "https://red-tarot.example/login?error=signout");
+  assert.doesNotMatch(location ?? "", /provider|secret/i);
+});
+
+test("signout maps a thrown error to a stable user-safe code", async () => {
+  const response = await handleAuthSignout(
+    new Request("https://red-tarot.example/auth/signout", { method: "POST" }),
+    async () => ({
+      auth: {
+        async signOut() {
+          throw new Error("transport_secret");
+        },
+      },
+    }),
+  );
+  const location = response.headers.get("location");
+
+  assert.equal(location, "https://red-tarot.example/login?error=signout");
+  assert.doesNotMatch(location ?? "", /transport_secret/i);
 });

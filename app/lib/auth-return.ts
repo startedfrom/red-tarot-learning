@@ -13,6 +13,8 @@ export const AUTH_ERROR_MESSAGES = {
   config: "로그인 연결이 아직 준비되지 않았어요.",
   missing_code: "로그인 응답을 확인할 수 없어요. 다시 시도해 주세요.",
   callback: "로그인을 완료하지 못했어요. 다시 시도해 주세요.",
+  csrf: "안전한 로그아웃 요청인지 확인할 수 없어요. 다시 시도해 주세요.",
+  signout: "로그아웃을 완료하지 못했어요. 다시 시도해 주세요.",
 } as const;
 
 export type AuthErrorCode = keyof typeof AUTH_ERROR_MESSAGES;
@@ -26,6 +28,8 @@ export function safeReturnPath(value?: string | null): string {
     return DEFAULT_RETURN_PATH;
   }
 
+  // Return targets use strict canonical paths: no schemes, dot segments,
+  // encoded separators, or auth routes.
   const rawPathname = value.split(/[?#]/, 1)[0];
   if (!hasSafeDecodedPathnames(rawPathname)) {
     return DEFAULT_RETURN_PATH;
