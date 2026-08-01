@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AppShell } from "../../components/AppShell";
 import { CardDetail } from "../../components/CardDetail";
+import { JsonLd } from "../../components/JsonLd";
 import { allCards, getCard } from "../../data/cards";
+import { createArticleStructuredData } from "../../lib/structured-data";
 
 type Props = { params: Promise<{ cardId: string }> };
 
@@ -24,5 +26,15 @@ export default async function CardPage({ params }: Props) {
   const { cardId } = await params;
   const card = getCard(cardId);
   if (!card) notFound();
-  return <AppShell active="cards"><CardDetail card={card} /></AppShell>;
+  const structured = createArticleStructuredData({
+    headline: `${card.nameKo} 카드 뜻`,
+    description: card.coreMeaning,
+    path: `/cards/${card.id}`,
+    breadcrumbs: [
+      { name: "홈", path: "/" },
+      { name: "카드 사전", path: "/cards" },
+      { name: card.nameKo, path: `/cards/${card.id}` },
+    ],
+  });
+  return <><JsonLd data={structured.article} /><JsonLd data={structured.breadcrumb} /><AppShell active="cards"><CardDetail card={card} /></AppShell></>;
 }

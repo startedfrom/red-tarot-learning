@@ -85,6 +85,8 @@ test("renders a complete card detail", async () => {
   assert.match(html, /상징으로 더 깊이 읽기/);
   assert.match(html, /흔한 오해/);
   assert.match(html, /rel="canonical" href="http:\/\/localhost\/cards\/the-lovers"/);
+  assert.match(html, /type="application\/ld\+json"/);
+  assert.match(html, /BreadcrumbList/);
 });
 
 test("renders a searchable 78-card library", async () => {
@@ -101,13 +103,14 @@ test("renders a searchable 78-card library", async () => {
   assert.match(html, /펜타클/);
 });
 
-test("renders a recovery view for an unknown card", async () => {
-  const response = await render("/cards/not-a-card");
-  const html = await response.text();
-
-  assert.equal(response.status, 200);
-  assert.match(html, /카드를 찾지 못했어요/);
-  assert.match(html, /바보 카드부터 보기/);
+test("returns a real recovery 404 for unknown content", async () => {
+  for (const pathname of ["/cards/not-a-card", "/readings/not-a-reading", "/guides/not-a-guide"]) {
+    const response = await render(pathname);
+    const html = await response.text();
+    assert.equal(response.status, 404);
+    assert.match(html, /페이지를 찾지 못했어요/);
+    assert.match(html, /카드 검색하기/);
+  }
 });
 
 test("renders the full three-card lesson structure", async () => {
