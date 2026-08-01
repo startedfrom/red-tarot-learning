@@ -10,6 +10,8 @@ import {
   toggleFavorite,
 } from "../app/lib/progress";
 
+const LEGACY_TIMESTAMP = "1970-01-01T00:00:00.000Z";
+
 test("repairs malformed stored progress", () => {
   assert.deepEqual(parseProgress("not-json"), defaultProgress);
   assert.deepEqual(
@@ -21,6 +23,46 @@ test("repairs malformed stored progress", () => {
       JSON.stringify({
         ...defaultProgress,
         quizAttempts: { lesson: { correct: "yes", answeredAt: 42 } },
+      }),
+    ),
+    defaultProgress,
+  );
+  assert.deepEqual(
+    parseProgress(
+      JSON.stringify({
+        ...defaultProgress,
+        updatedAt: "not-an-iso-timestamp",
+      }),
+    ),
+    defaultProgress,
+  );
+  assert.deepEqual(
+    parseProgress(
+      JSON.stringify({
+        ...defaultProgress,
+        quizAttempts: {
+          lesson: { correct: false, answeredAt: "not-an-iso-timestamp" },
+        },
+      }),
+    ),
+    defaultProgress,
+  );
+  assert.deepEqual(
+    parseProgress(
+      JSON.stringify({
+        ...defaultProgress,
+        lastLessonChangedAt: "not-an-iso-timestamp",
+      }),
+    ),
+    defaultProgress,
+  );
+  assert.deepEqual(
+    parseProgress(
+      JSON.stringify({
+        ...defaultProgress,
+        favoriteChanges: {
+          "the-star": { favorite: true, changedAt: "not-an-iso-timestamp" },
+        },
       }),
     ),
     defaultProgress,
@@ -48,16 +90,78 @@ test("migrates v1 progress without losing learning state", () => {
     streak: 3,
     lastStudyDate: "2026-07-21",
     quizAttempts: {},
-    studyDays: ["2026-07-21"],
+    studyDays: ["2026-07-19", "2026-07-20", "2026-07-21"],
+    favoriteChanges: {
+      "the-lovers": { favorite: true, changedAt: LEGACY_TIMESTAMP },
+    },
     lastLessonChangedAt: null,
-    updatedAt: "",
+    updatedAt: LEGACY_TIMESTAMP,
   });
 });
 
+test("preserves a migrated v1 streak on the next study day", () => {
+  const migrated = parseProgress(
+    JSON.stringify({
+      favoriteCardIds: [],
+      completedLessonIds: [],
+      wrongLessonIds: [],
+      lastLessonId: null,
+      streak: 7,
+      lastStudyDate: "2026-07-21",
+    }),
+  );
+  const next = recordStudyDay(
+    migrated,
+    "2026-07-22",
+    "2026-07-21",
+    "2026-07-22T10:00:00.000Z",
+  );
+
+  assert.equal(migrated.studyDays.length, 7);
+  assert.equal(next.streak, 8);
+});
+
+test("upgrades early v2 favorites to deterministic change metadata", () => {
+  const upgraded = parseProgress(
+    JSON.stringify({
+      version: 2,
+      favoriteCardIds: ["the-star"],
+      completedLessonIds: [],
+      wrongLessonIds: [],
+      lastLessonId: null,
+      streak: 0,
+      lastStudyDate: null,
+      quizAttempts: {},
+      studyDays: [],
+      lastLessonChangedAt: null,
+      updatedAt: "",
+    }),
+  );
+
+  assert.deepEqual(upgraded.favoriteChanges, {
+    "the-star": { favorite: true, changedAt: LEGACY_TIMESTAMP },
+  });
+  assert.equal(upgraded.updatedAt, LEGACY_TIMESTAMP);
+});
+
 test("updates favorites, completion, and wrong answers without duplicates", () => {
-  let progress = toggleFavorite(defaultProgress, "the-lovers");
-  progress = toggleFavorite(progress, "the-lovers");
+  let progress = toggleFavorite(
+    defaultProgress,
+    "the-lovers",
+    "2026-07-21T10:00:00.000Z",
+  );
+  progress = toggleFavorite(
+    progress,
+    "the-lovers",
+    "2026-07-21T11:00:00.000Z",
+  );
   assert.deepEqual(progress.favoriteCardIds, []);
+  assert.deepEqual(progress.favoriteChanges, {
+    "the-lovers": {
+      favorite: false,
+      changedAt: "2026-07-21T11:00:00.000Z",
+    },
+  });
 
   progress = markLessonComplete(progress, "love-three-001");
   progress = markLessonComplete(progress, "love-three-001");
@@ -104,6 +208,34 @@ test("records timestamped mutations in mergeable fields", () => {
   );
   assert.equal(completed.lastLessonChangedAt, "2026-07-21T10:01:00.000Z");
   assert.equal(completed.updatedAt, "2026-07-21T10:01:00.000Z");
+});
+
+test("repairs invalid stored study days and refuses to record an invalid day", () => {
+  const repaired = parseProgress(
+    JSON.stringify({
+      ...defaultProgress,
+      streak: 99,
+      lastStudyDate: "not-a-day",
+      studyDays: ["2026-02-30", "2026-07-20", "not-a-day"],
+      updatedAt: "2026-07-20T10:00:00.000Z",
+    }),
+  );
+
+  assert.deepEqual(repaired.studyDays, ["2026-07-20"]);
+  assert.equal(repaired.lastStudyDate, "2026-07-20");
+  assert.equal(repaired.streak, 1);
+  assert.strictEqual(
+    recordStudyDay(repaired, "2026-02-30", "2026-02-29"),
+    repaired,
+  );
+
+  const safelyTimestamped = toggleFavorite(
+    defaultProgress,
+    "the-star",
+    "not-an-iso-timestamp",
+  );
+  assert.notEqual(safelyTimestamped.updatedAt, "not-an-iso-timestamp");
+  assert.equal(Number.isNaN(Date.parse(safelyTimestamped.updatedAt)), false);
 });
 
 test("keeps learning usable when storage writes fail", () => {

@@ -1,3 +1,5 @@
+import { isIsoTimestamp } from "./progress";
+
 export const SYNC_QUEUE_STORAGE_KEY = "red-tarot-sync-queue-v1";
 
 export type SyncEvent = {
@@ -23,7 +25,7 @@ function isSyncEvent(value: unknown): value is SyncEvent {
     typeof event.eventId === "string" &&
     typeof event.kind === "string" &&
     typeof event.entityId === "string" &&
-    typeof event.changedAt === "string"
+    isIsoTimestamp(event.changedAt)
   );
 }
 
@@ -72,7 +74,7 @@ export function safeWriteSyncQueue(
   storage: WritableStorage | undefined,
   events: SyncEvent[],
 ): boolean {
-  if (!storage) return false;
+  if (!storage || !events.every(isSyncEvent)) return false;
 
   try {
     const queue: StoredSyncQueue = {

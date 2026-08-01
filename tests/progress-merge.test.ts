@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { LearningProgress } from "../app/lib/progress";
+import { parseProgress, type LearningProgress } from "../app/lib/progress";
 import { mergeProgress } from "../app/lib/progress-merge";
 import {
   SYNC_QUEUE_STORAGE_KEY,
@@ -24,8 +24,9 @@ function progress(
     lastStudyDate: null,
     quizAttempts: {},
     studyDays: [],
+    favoriteChanges: {},
     lastLessonChangedAt: null,
-    updatedAt: "",
+    updatedAt: "1970-01-01T00:00:00.000Z",
     ...overrides,
   };
 }
@@ -90,7 +91,36 @@ test("keeps the newest quiz answer and derives wrong lessons from it", () => {
   const merged = mergeProgress(local, remote);
 
   assert.equal(merged.quizAttempts["lesson-a"].correct, true);
-  assert.deepEqual(merged.wrongLessonIds, ["lesson-b", "legacy-local"]);
+  assert.deepEqual(merged.wrongLessonIds, ["legacy-local", "lesson-b"]);
+});
+
+test("keeps a timestamped unfavorite over a stale favorite", () => {
+  const merged = mergeProgress(
+    progress({
+      favoriteCardIds: [],
+      favoriteChanges: {
+        "the-star": {
+          favorite: false,
+          changedAt: "2026-07-22T10:00:00.000Z",
+        },
+      },
+    }),
+    progress({
+      favoriteCardIds: ["the-star"],
+      favoriteChanges: {
+        "the-star": {
+          favorite: true,
+          changedAt: "2026-07-21T10:00:00.000Z",
+        },
+      },
+    }),
+  );
+
+  assert.deepEqual(merged.favoriteCardIds, []);
+  assert.deepEqual(merged.favoriteChanges["the-star"], {
+    favorite: false,
+    changedAt: "2026-07-22T10:00:00.000Z",
+  });
 });
 
 test("compares ISO timestamps by instant rather than string order", () => {
@@ -187,6 +217,122 @@ test("uses the newest progress update timestamp", () => {
   assert.equal(merged.updatedAt, "2026-07-22T10:00:00.000Z");
 });
 
+test("merge is commutative with deterministic ties and canonical arrays", () => {
+  const changedAt = "2026-07-21T10:00:00.000Z";
+  const left = progress({
+    favoriteCardIds: ["the-star", "the-lovers"],
+    completedLessonIds: ["lesson-z", "lesson-a"],
+    wrongLessonIds: ["legacy-z", "legacy-a"],
+    lastLessonId: "lesson-a",
+    lastLessonChangedAt: changedAt,
+    quizAttempts: {
+      lesson: { correct: false, answeredAt: changedAt },
+    },
+    studyDays: ["2026-07-21", "2026-07-20"],
+  });
+  const right = progress({
+    lastLessonId: "lesson-z",
+    lastLessonChangedAt: changedAt,
+    quizAttempts: {
+      lesson: { correct: true, answeredAt: changedAt },
+    },
+  });
+
+  const leftRight = mergeProgress(left, right);
+  const rightLeft = mergeProgress(right, left);
+
+  assert.deepEqual(leftRight, rightLeft);
+  assert.equal(leftRight.quizAttempts.lesson.correct, true);
+  assert.equal(leftRight.lastLessonId, "lesson-z");
+  assert.deepEqual(leftRight.favoriteCardIds, ["the-lovers", "the-star"]);
+  assert.deepEqual(leftRight.completedLessonIds, ["lesson-a", "lesson-z"]);
+  assert.deepEqual(leftRight.wrongLessonIds, ["legacy-a", "legacy-z"]);
+  assert.deepEqual(leftRight.studyDays, ["2026-07-20", "2026-07-21"]);
+});
+
+test("merge is associative and idempotent", () => {
+  const first = progress({
+    favoriteCardIds: ["the-star"],
+    favoriteChanges: {
+      "the-star": {
+        favorite: true,
+        changedAt: "2026-07-20T10:00:00.000Z",
+      },
+    },
+    completedLessonIds: ["lesson-c"],
+    lastLessonId: "lesson-a",
+    lastLessonChangedAt: "2026-07-20T10:00:00.000Z",
+    quizAttempts: {
+      lesson: {
+        correct: false,
+        answeredAt: "2026-07-20T10:00:00.000Z",
+      },
+    },
+    studyDays: ["2026-07-20"],
+  });
+  const second = progress({
+    favoriteChanges: {
+      "the-star": {
+        favorite: false,
+        changedAt: "2026-07-21T10:00:00.000Z",
+      },
+    },
+    completedLessonIds: ["lesson-b"],
+    lastLessonId: "lesson-c",
+    lastLessonChangedAt: "2026-07-21T10:00:00.000Z",
+    quizAttempts: {
+      lesson: {
+        correct: true,
+        answeredAt: "2026-07-20T10:00:00.000Z",
+      },
+    },
+    studyDays: ["2026-07-21"],
+  });
+  const third = progress({
+    favoriteCardIds: ["the-star"],
+    favoriteChanges: {
+      "the-star": {
+        favorite: true,
+        changedAt: "2026-07-21T10:00:00.000Z",
+      },
+    },
+    completedLessonIds: ["lesson-a"],
+    lastLessonId: "lesson-b",
+    lastLessonChangedAt: "2026-07-21T10:00:00.000Z",
+    quizAttempts: {
+      lesson: {
+        correct: false,
+        answeredAt: "2026-07-22T10:00:00.000Z",
+      },
+    },
+    studyDays: ["2026-07-22"],
+  });
+
+  const leftAssociated = mergeProgress(mergeProgress(first, second), third);
+  const rightAssociated = mergeProgress(first, mergeProgress(second, third));
+
+  assert.deepEqual(leftAssociated, rightAssociated);
+  assert.deepEqual(
+    mergeProgress(leftAssociated, leftAssociated),
+    leftAssociated,
+  );
+});
+
+test("a migrated v1 streak survives its first merge", () => {
+  const migrated = parseProgress(
+    JSON.stringify({
+      favoriteCardIds: [],
+      completedLessonIds: [],
+      wrongLessonIds: [],
+      lastLessonId: null,
+      streak: 7,
+      lastStudyDate: "2026-07-21",
+    }),
+  );
+
+  assert.equal(mergeProgress(migrated, progress()).streak, 7);
+});
+
 test("deduplicates sync events stably and rejects malformed stored queues", () => {
   const first: SyncEvent = {
     eventId: "event-1",
@@ -205,6 +351,15 @@ test("deduplicates sync events stably and rejects malformed stored queues", () =
   assert.deepEqual(dedupeSyncEvents([first, duplicate, second]), [first, second]);
   assert.deepEqual(parseSyncQueue("not-json"), []);
   assert.deepEqual(parseSyncQueue(JSON.stringify({ version: 1, events: [{}] })), []);
+  assert.deepEqual(
+    parseSyncQueue(
+      JSON.stringify({
+        version: 1,
+        events: [{ ...first, changedAt: "not-an-iso-timestamp" }],
+      }),
+    ),
+    [],
+  );
 });
 
 test("reads and writes a deduplicated versioned sync queue safely", () => {
@@ -229,6 +384,13 @@ test("reads and writes a deduplicated versioned sync queue safely", () => {
   assert.deepEqual(
     JSON.parse(values.get(SYNC_QUEUE_STORAGE_KEY) ?? ""),
     { version: 1, events: [event] },
+  );
+  assert.deepEqual(safeReadSyncQueue(storage), [event]);
+  assert.equal(
+    safeWriteSyncQueue(storage, [
+      { ...event, changedAt: "not-an-iso-timestamp" },
+    ]),
+    false,
   );
   assert.deepEqual(safeReadSyncQueue(storage), [event]);
   assert.deepEqual(safeReadSyncQueue(undefined), []);
