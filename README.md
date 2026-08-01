@@ -96,3 +96,15 @@ actions tied to the current ChatGPT user. Leave public content anonymous.
 
 - [vinext Documentation](https://github.com/cloudflare/vinext)
 - [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+
+## Public content service
+
+- `/cards/[cardId]`: 78 indexable card meaning pages
+- `/readings/[setId]`: 30 curated reading examples
+- `/guides/[slug]`: reviewed beginner guides
+- `/practice/[setId]`: interactive learning, intentionally `noindex`
+- `/me`: device-local progress dashboard, intentionally `noindex`
+
+Set `NEXT_PUBLIC_SITE_URL` to the owned production origin before generating the production sitemap. Until a custom domain is connected, the deployed Sites origin is the canonical fallback.
+
+Advertising, analytics, and account synchronization are not active in this foundation slice. Trust pages describe only the data behavior that is actually running.
