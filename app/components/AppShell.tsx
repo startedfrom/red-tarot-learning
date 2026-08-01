@@ -1,23 +1,18 @@
 import Link from "next/link";
-import { BookOpen, Heart, Home, Sparkles } from "lucide-react";
+import { BookOpen, Home, Layers3, UserRound } from "lucide-react";
 
-type ActiveSection = "home" | "cards" | "practice" | "review";
+type ActiveSection = "home" | "cards" | "readings" | "practice" | "me";
 
 const navItems = [
   { id: "home", label: "홈", href: "/", Icon: Home },
   { id: "cards", label: "카드", href: "/cards", Icon: BookOpen },
-  {
-    id: "practice",
-    label: "연습",
-    href: "/practice/love-three-001",
-    Icon: Sparkles,
-  },
-  { id: "review", label: "복습", href: "/#review", Icon: Heart },
+  { id: "readings", label: "조합", href: "/readings", Icon: Layers3 },
+  { id: "me", label: "내 학습", href: "/me", Icon: UserRound },
 ] as const;
 
 export function AppShell({
   children,
-  active = "home",
+  active,
 }: {
   children: React.ReactNode;
   active?: ActiveSection;
@@ -36,12 +31,11 @@ export function AppShell({
             <span>빨강타로</span>
           </Link>
           <div className="header-links" aria-label="빠른 메뉴">
-            <Link href="/cards">78장 카드책</Link>
-            <Link href="/practice/love-three-001">150세트 연습</Link>
+            <Link href="/cards">카드 사전</Link>
+            <Link href="/readings">조합 예제</Link>
+            <Link href="/guides">기초 가이드</Link>
           </div>
-          <span className="profile-dot" aria-label="내 학습 기록">
-            나
-          </span>
+          <Link className="profile-dot" href="/me" aria-label="내 학습 기록">나</Link>
         </header>
 
         <main id="main-content">{children}</main>

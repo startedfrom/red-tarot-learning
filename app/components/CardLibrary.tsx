@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { allCards, type TarotCard } from "../data/cards";
 import { TarotCardVisual } from "./TarotCardVisual";
 
-type CardFilter = "all" | "major" | "wands" | "cups" | "swords" | "pentacles";
+export type CardFilter = "all" | "major" | "wands" | "cups" | "swords" | "pentacles";
 
 const filters: { id: CardFilter; label: string }[] = [
   { id: "all", label: "전체" },
@@ -25,9 +25,9 @@ function matchesFilter(card: TarotCard, filter: CardFilter) {
   return card.id.endsWith(`of-${filter}`);
 }
 
-export function CardLibrary() {
+export function CardLibrary({ initialFilter = "all" }: { initialFilter?: CardFilter }) {
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<CardFilter>("all");
+  const [filter, setFilter] = useState<CardFilter>(initialFilter);
   const [page, setPage] = useState(0);
 
   const filteredCards = useMemo(() => {

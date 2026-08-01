@@ -28,24 +28,35 @@ test("renders the Red Tarot home instead of the starter", async () => {
 
   assert.equal(response.status, 200);
   assert.match(html, /빨강타로/);
-  assert.match(html, /오늘은/);
-  assert.match(html, /홈/);
-  assert.match(html, /카드/);
-  assert.match(html, /연습/);
-  assert.match(html, /복습/);
+  assert.match(html, /어떤 카드가 궁금하세요/);
+  assert.match(html, /카드 이름·키워드·궁금한 해석 검색/);
+  assert.match(html, /처음엔 이 카드부터/);
+  assert.match(html, /초보자 인기 가이드/);
+  assert.match(html, /카드를 함께 읽어봐요/);
+  assert.match(html, /첫 연습 시작/);
   assert.match(html, /lang="ko"/);
-  assert.match(html, /7분 학습 시작/);
-  assert.match(html, /나의 학습 정원/);
-  assert.match(html, /연애/);
-  assert.match(html, /재물/);
-  assert.match(html, /건강/);
-  assert.match(html, /최근 헷갈린 카드/);
-  assert.match(html, /78장/);
-  assert.match(html, /150세트/);
+  assert.doesNotMatch(html, /나의 학습 정원/);
   assert.doesNotMatch(
     html,
     /Your site is taking shape|codex-preview|react-loading-skeleton/i,
   );
+});
+
+test("keeps the local learning dashboard at /me", async () => {
+  const response = await render("/me");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /나의 학습 정원/);
+  assert.match(html, /최근 헷갈린 카드/);
+  assert.match(html, /name="robots" content="noindex, nofollow"/);
+});
+
+test("uses the homepage card filter query on first render", async () => {
+  const response = await render("/cards?type=major");
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, />22<small>장<\/small>/);
 });
 
 test("publishes site-specific social sharing metadata", async () => {
