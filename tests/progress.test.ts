@@ -16,6 +16,42 @@ test("repairs malformed stored progress", () => {
     parseProgress(JSON.stringify({ streak: -2 })),
     defaultProgress,
   );
+  assert.deepEqual(
+    parseProgress(
+      JSON.stringify({
+        ...defaultProgress,
+        quizAttempts: { lesson: { correct: "yes", answeredAt: 42 } },
+      }),
+    ),
+    defaultProgress,
+  );
+});
+
+test("migrates v1 progress without losing learning state", () => {
+  const migrated = parseProgress(
+    JSON.stringify({
+      favoriteCardIds: ["the-lovers", "the-lovers"],
+      completedLessonIds: ["love-three-001"],
+      wrongLessonIds: ["love-three-002"],
+      lastLessonId: "love-three-001",
+      streak: 3,
+      lastStudyDate: "2026-07-21",
+    }),
+  );
+
+  assert.deepEqual(migrated, {
+    version: 2,
+    favoriteCardIds: ["the-lovers"],
+    completedLessonIds: ["love-three-001"],
+    wrongLessonIds: ["love-three-002"],
+    lastLessonId: "love-three-001",
+    streak: 3,
+    lastStudyDate: "2026-07-21",
+    quizAttempts: {},
+    studyDays: ["2026-07-21"],
+    lastLessonChangedAt: null,
+    updatedAt: "",
+  });
 });
 
 test("updates favorites, completion, and wrong answers without duplicates", () => {
@@ -39,8 +75,35 @@ test("increments a streak once per study day", () => {
   const nextDay = recordStudyDay(sameDay, "2026-07-21", "2026-07-20");
 
   assert.equal(first.streak, 1);
+  assert.deepEqual(first.studyDays, ["2026-07-20"]);
   assert.equal(sameDay.streak, 1);
+  assert.deepEqual(sameDay.studyDays, ["2026-07-20"]);
   assert.equal(nextDay.streak, 2);
+  assert.deepEqual(nextDay.studyDays, ["2026-07-20", "2026-07-21"]);
+});
+
+test("records timestamped mutations in mergeable fields", () => {
+  const answered = recordQuizAnswer(
+    defaultProgress,
+    "love-three-001",
+    false,
+    "2026-07-21T10:00:00.000Z",
+  );
+  assert.deepEqual(answered.quizAttempts, {
+    "love-three-001": {
+      correct: false,
+      answeredAt: "2026-07-21T10:00:00.000Z",
+    },
+  });
+  assert.equal(answered.updatedAt, "2026-07-21T10:00:00.000Z");
+
+  const completed = markLessonComplete(
+    answered,
+    "love-three-001",
+    "2026-07-21T10:01:00.000Z",
+  );
+  assert.equal(completed.lastLessonChangedAt, "2026-07-21T10:01:00.000Z");
+  assert.equal(completed.updatedAt, "2026-07-21T10:01:00.000Z");
 });
 
 test("keeps learning usable when storage writes fail", () => {
