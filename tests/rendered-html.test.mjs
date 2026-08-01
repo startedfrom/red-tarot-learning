@@ -75,12 +75,16 @@ test("renders a complete card detail", async () => {
   const html = await response.text();
 
   assert.equal(response.status, 200);
-  assert.match(html, /연인/);
+  assert.match(html, /연인 카드 뜻/);
   assert.match(html, /선택한다/);
-  assert.match(html, /핵심 의미/);
-  assert.match(html, /정·역방향/);
-  assert.match(html, /분야별/);
-  assert.match(html, /상징/);
+  assert.match(html, /서로의 감정과 관계 방향을 선택함/);
+  assert.match(html, /감정과 행동 또는 가치가 일치하지 않음/);
+  assert.match(html, /연애에서 읽기/);
+  assert.match(html, /재물에서 읽기/);
+  assert.match(html, /건강에서 읽기/);
+  assert.match(html, /상징으로 더 깊이 읽기/);
+  assert.match(html, /흔한 오해/);
+  assert.match(html, /rel="canonical" href="http:\/\/localhost\/cards\/the-lovers"/);
 });
 
 test("renders a searchable 78-card library", async () => {
