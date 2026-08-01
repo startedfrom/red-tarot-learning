@@ -44,6 +44,35 @@ function policyDefinition(
   return match[0].replace(/\s+/g, " ").trim().toLowerCase();
 }
 
+function databaseTableDefinition(
+  types: string,
+  table: (typeof tables)[number],
+): string {
+  const tableStart = new RegExp(`^      ${table}: \\{`, "m").exec(types);
+  assert.ok(tableStart, `${table} must have a database type block`);
+
+  const afterStart = types.slice(tableStart.index + tableStart[0].length);
+  const tableEnd = afterStart.search(/^      [a-z_]+: \{|^    \};/m);
+  assert.notEqual(tableEnd, -1, `${table} database type block must close`);
+  return afterStart.slice(0, tableEnd);
+}
+
+function tableAccessRevocation(sql: string): {
+  grantees: string[];
+  tableList: string;
+} {
+  const match = sql.match(
+    /revoke\s+all\s+on\s+table([\s\S]*?)from\s+([^;]+);/i,
+  );
+  assert.ok(match, "table access must be explicitly revoked");
+  return {
+    tableList: match[1].replace(/\s+/g, " ").trim().toLowerCase(),
+    grantees: match[2]
+      .split(",")
+      .map((role) => role.trim().toLowerCase()),
+  };
+}
+
 test("creates every user progress table with the required columns", () => {
   const sql = readProjectFile(
     "supabase/migrations/202608020001_user_progress.sql",
@@ -213,6 +242,7 @@ test("grants data access to authenticated users but not anonymous users", () => 
     "supabase/migrations/202608020001_user_progress.sql",
   );
   const tableList = tables.map((table) => `public.${table}`).join(", ");
+  const revocation = tableAccessRevocation(sql);
 
   assert.match(
     sql,
@@ -225,7 +255,21 @@ test("grants data access to authenticated users but not anonymous users", () => 
       "i",
     ),
   );
-  assert.match(sql, /revoke\s+all[\s\S]*from\s+(?:[a-z_]+,\s*)*anon/i);
+  for (const table of tables) {
+    assert.match(
+      revocation.tableList,
+      new RegExp(`\\bpublic\\.${table}\\b`),
+      `all access to ${table} must be revoked before granting authenticated access`,
+    );
+  }
+  assert.ok(
+    revocation.grantees.includes("anon"),
+    "table access must be revoked from anon",
+  );
+  assert.ok(
+    revocation.grantees.includes("public"),
+    "table access must be revoked from public",
+  );
   assert.doesNotMatch(sql, /service[_-]?role/i);
 });
 
@@ -235,15 +279,15 @@ test("provides generated-style typed table contracts without any", () => {
   assert.match(types, /export type Json\s*=/);
   assert.match(types, /export type Database\s*=/);
   for (const table of tables) {
-    assert.match(
-      types,
-      new RegExp(`${table}:\\s*\\{[\\s\\S]*?Row:\\s*\\{`, "m"),
-      `${table} needs a Row type`,
-    );
+    const definition = databaseTableDefinition(types, table);
+    for (const section of ["Row", "Insert", "Update", "Relationships"]) {
+      assert.match(
+        definition,
+        new RegExp(`^        ${section}:`, "m"),
+        `${table} needs a ${section} type`,
+      );
+    }
   }
-  assert.match(types, /Insert:\s*\{/);
-  assert.match(types, /Update:\s*\{/);
-  assert.match(types, /Relationships:\s*\[/);
   assert.doesNotMatch(types, /\bany\b/);
 });
 
