@@ -1,5 +1,6 @@
 export const STORAGE_KEY = "red-tarot-progress-v1";
 export const UNKNOWN_CHANGED_AT = "1970-01-01T00:00:00.000Z";
+export const MAX_STREAK_DAYS = 3660;
 
 export type QuizAttempt = {
   correct: boolean;
@@ -50,7 +51,12 @@ function isNullableString(value: unknown): value is string | null {
 }
 
 function isValidStreak(value: unknown): value is number {
-  return typeof value === "number" && Number.isInteger(value) && value >= 0;
+  return (
+    typeof value === "number" &&
+    Number.isInteger(value) &&
+    value >= 0 &&
+    value <= MAX_STREAK_DAYS
+  );
 }
 
 export function isCalendarDay(value: unknown): value is string {
@@ -133,6 +139,7 @@ function isFavoriteChanges(
 }
 
 const sortedUnique = (values: string[]) => [...new Set(values)].sort();
+const unique = (values: string[]) => [...new Set(values)];
 
 function cloneDefaultProgress(): LearningProgress {
   return {
@@ -161,7 +168,7 @@ function parseCommonFields(value: Record<string, unknown>) {
   return {
     favoriteCardIds: sortedUnique(value.favoriteCardIds),
     completedLessonIds: sortedUnique(value.completedLessonIds),
-    wrongLessonIds: sortedUnique(value.wrongLessonIds),
+    wrongLessonIds: unique(value.wrongLessonIds),
     lastLessonId: value.lastLessonId,
     streak: value.streak,
     lastStudyDate: value.lastStudyDate,
@@ -247,6 +254,50 @@ function canonicalQuizAttempts(
   );
 }
 
+function legacyWrongAnsweredAt(index: number): string {
+  return new Date(Date.parse(UNKNOWN_CHANGED_AT) + index).toISOString();
+}
+
+export function quizAttemptsWithLegacy(
+  attempts: Record<string, QuizAttempt>,
+  wrongLessonIds: string[],
+): Record<string, QuizAttempt> {
+  const combined = Object.fromEntries(
+    Object.entries(attempts).map(([lessonId, attempt]) => [
+      lessonId,
+      { ...attempt },
+    ]),
+  );
+
+  for (const [index, lessonId] of unique(wrongLessonIds).entries()) {
+    if (!combined[lessonId]) {
+      combined[lessonId] = {
+        correct: false,
+        answeredAt: legacyWrongAnsweredAt(index),
+      };
+    }
+  }
+
+  return canonicalQuizAttempts(combined);
+}
+
+export function wrongLessonIdsFromAttempts(
+  attempts: Record<string, QuizAttempt>,
+): string[] {
+  return Object.entries(attempts)
+    .filter(([, attempt]) => !attempt.correct)
+    .sort(([firstLessonId, first], [secondLessonId, second]) => {
+      const timestampComparison = compareIsoTimestampInstants(
+        first.answeredAt,
+        second.answeredAt,
+      );
+      return timestampComparison !== 0
+        ? timestampComparison
+        : compareStrings(firstLessonId, secondLessonId);
+    })
+    .map(([lessonId]) => lessonId);
+}
+
 function migratedStudyDays(
   lastStudyDate: string | null,
   streak: number,
@@ -315,13 +366,18 @@ export function parseProgress(raw: string | null): LearningProgress {
         record.favoriteChanges ?? {},
       );
 
+      const quizAttempts = quizAttemptsWithLegacy(
+        record.quizAttempts,
+        common.wrongLessonIds,
+      );
       return {
         version: 2,
         ...common,
         favoriteCardIds: favoriteIdsFromChanges(favoriteChanges),
+        wrongLessonIds: wrongLessonIdsFromAttempts(quizAttempts),
         streak: calculateStreak(studyDays),
         lastStudyDate: studyDays.at(-1) ?? null,
-        quizAttempts: canonicalQuizAttempts(record.quizAttempts),
+        quizAttempts,
         studyDays,
         favoriteChanges,
         lastLessonChangedAt: record.lastLessonChangedAt,
@@ -336,13 +392,15 @@ export function parseProgress(raw: string | null): LearningProgress {
 
     const studyDays = migratedStudyDays(common.lastStudyDate, common.streak);
     const favoriteChanges = legacyFavoriteChanges(common.favoriteCardIds);
+    const quizAttempts = quizAttemptsWithLegacy({}, common.wrongLessonIds);
     return {
       version: 2,
       ...common,
       favoriteCardIds: favoriteIdsFromChanges(favoriteChanges),
+      wrongLessonIds: wrongLessonIdsFromAttempts(quizAttempts),
       streak: calculateStreak(studyDays),
       lastStudyDate: studyDays.at(-1) ?? null,
-      quizAttempts: {},
+      quizAttempts,
       studyDays,
       favoriteChanges,
       lastLessonChangedAt: null,
@@ -398,15 +456,17 @@ export function recordQuizAnswer(
   answeredAt = new Date().toISOString(),
 ): LearningProgress {
   const timestamp = normalizeIsoTimestamp(answeredAt);
+  const quizAttempts = canonicalQuizAttempts({
+    ...quizAttemptsWithLegacy(
+      progress.quizAttempts,
+      progress.wrongLessonIds,
+    ),
+    [lessonId]: { correct, answeredAt: timestamp },
+  });
   return {
     ...progress,
-    wrongLessonIds: correct
-      ? progress.wrongLessonIds.filter((id) => id !== lessonId).sort()
-      : sortedUnique([...progress.wrongLessonIds, lessonId]),
-    quizAttempts: canonicalQuizAttempts({
-      ...progress.quizAttempts,
-      [lessonId]: { correct, answeredAt: timestamp },
-    }),
+    wrongLessonIds: wrongLessonIdsFromAttempts(quizAttempts),
+    quizAttempts,
     updatedAt: timestamp,
   };
 }

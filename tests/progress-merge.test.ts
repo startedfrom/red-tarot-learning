@@ -94,6 +94,66 @@ test("keeps the newest quiz answer and derives wrong lessons from it", () => {
   assert.deepEqual(merged.wrongLessonIds, ["legacy-local", "lesson-b"]);
 });
 
+test("merges wrong answers in recency order and keeps the newest last", () => {
+  const merged = mergeProgress(
+    progress({
+      wrongLessonIds: ["lesson-a"],
+      quizAttempts: {
+        "lesson-a": {
+          correct: false,
+          answeredAt: "2026-07-21T12:00:00.000Z",
+        },
+      },
+    }),
+    progress({
+      wrongLessonIds: ["lesson-z"],
+      quizAttempts: {
+        "lesson-z": {
+          correct: false,
+          answeredAt: "2026-07-21T11:00:00.000Z",
+        },
+      },
+    }),
+  );
+
+  assert.deepEqual(merged.wrongLessonIds, ["lesson-z", "lesson-a"]);
+  assert.deepEqual([...merged.wrongLessonIds].reverse(), [
+    "lesson-a",
+    "lesson-z",
+  ]);
+});
+
+test("legacy wrong order survives merge and a newer correct answer removes it", () => {
+  const migrated = parseProgress(
+    JSON.stringify({
+      favoriteCardIds: [],
+      completedLessonIds: [],
+      wrongLessonIds: ["legacy-z", "legacy-a"],
+      lastLessonId: null,
+      streak: 0,
+      lastStudyDate: null,
+    }),
+  );
+  const remote = progress({
+    quizAttempts: {
+      "legacy-a": {
+        correct: true,
+        answeredAt: "2026-07-21T10:00:00.000Z",
+      },
+      "lesson-new": {
+        correct: false,
+        answeredAt: "2026-07-21T11:00:00.000Z",
+      },
+    },
+    wrongLessonIds: ["lesson-new"],
+  });
+
+  const merged = mergeProgress(migrated, remote);
+
+  assert.deepEqual(merged.wrongLessonIds, ["legacy-z", "lesson-new"]);
+  assert.equal(merged.quizAttempts["legacy-a"].correct, true);
+});
+
 test("keeps a timestamped unfavorite over a stale favorite", () => {
   const merged = mergeProgress(
     progress({
@@ -246,7 +306,7 @@ test("merge is commutative with deterministic ties and canonical arrays", () => 
   assert.equal(leftRight.lastLessonId, "lesson-z");
   assert.deepEqual(leftRight.favoriteCardIds, ["the-lovers", "the-star"]);
   assert.deepEqual(leftRight.completedLessonIds, ["lesson-a", "lesson-z"]);
-  assert.deepEqual(leftRight.wrongLessonIds, ["legacy-a", "legacy-z"]);
+  assert.deepEqual(leftRight.wrongLessonIds, ["legacy-z", "legacy-a"]);
   assert.deepEqual(leftRight.studyDays, ["2026-07-20", "2026-07-21"]);
 });
 

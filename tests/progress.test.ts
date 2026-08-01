@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  MAX_STREAK_DAYS,
   defaultProgress,
   markLessonComplete,
   parseProgress,
@@ -89,7 +90,12 @@ test("migrates v1 progress without losing learning state", () => {
     lastLessonId: "love-three-001",
     streak: 3,
     lastStudyDate: "2026-07-21",
-    quizAttempts: {},
+    quizAttempts: {
+      "love-three-002": {
+        correct: false,
+        answeredAt: LEGACY_TIMESTAMP,
+      },
+    },
     studyDays: ["2026-07-19", "2026-07-20", "2026-07-21"],
     favoriteChanges: {
       "the-lovers": { favorite: true, changedAt: LEGACY_TIMESTAMP },
@@ -119,6 +125,57 @@ test("preserves a migrated v1 streak on the next study day", () => {
 
   assert.equal(migrated.studyDays.length, 7);
   assert.equal(next.streak, 8);
+});
+
+test("preserves legacy wrong-answer recency with deterministic timestamps", () => {
+  const migrated = parseProgress(
+    JSON.stringify({
+      favoriteCardIds: [],
+      completedLessonIds: [],
+      wrongLessonIds: ["lesson-z", "lesson-a"],
+      lastLessonId: null,
+      streak: 0,
+      lastStudyDate: null,
+    }),
+  );
+
+  assert.deepEqual(migrated.wrongLessonIds, ["lesson-z", "lesson-a"]);
+  assert.deepEqual(migrated.quizAttempts, {
+    "lesson-a": {
+      correct: false,
+      answeredAt: "1970-01-01T00:00:00.001Z",
+    },
+    "lesson-z": { correct: false, answeredAt: LEGACY_TIMESTAMP },
+  });
+});
+
+test("rejects oversized streaks before migration expansion", () => {
+  assert.equal(MAX_STREAK_DAYS, 3660);
+
+  const boundary = parseProgress(
+    JSON.stringify({
+      favoriteCardIds: [],
+      completedLessonIds: [],
+      wrongLessonIds: [],
+      lastLessonId: null,
+      streak: 3660,
+      lastStudyDate: "2026-07-21",
+    }),
+  );
+  assert.equal(boundary.studyDays.length, 3660);
+  assert.equal(boundary.streak, 3660);
+
+  const oversized = parseProgress(
+    JSON.stringify({
+      favoriteCardIds: ["the-star"],
+      completedLessonIds: [],
+      wrongLessonIds: [],
+      lastLessonId: null,
+      streak: 3661,
+      lastStudyDate: "2026-07-21",
+    }),
+  );
+  assert.deepEqual(oversized, defaultProgress);
 });
 
 test("upgrades early v2 favorites to deterministic change metadata", () => {
@@ -208,6 +265,35 @@ test("records timestamped mutations in mergeable fields", () => {
   );
   assert.equal(completed.lastLessonChangedAt, "2026-07-21T10:01:00.000Z");
   assert.equal(completed.updatedAt, "2026-07-21T10:01:00.000Z");
+});
+
+test("orders wrong answers oldest first so reversing shows the newest first", () => {
+  const older = recordQuizAnswer(
+    defaultProgress,
+    "lesson-z",
+    false,
+    "2026-07-21T10:00:00.000Z",
+  );
+  const newer = recordQuizAnswer(
+    older,
+    "lesson-a",
+    false,
+    "2026-07-21T11:00:00.000Z",
+  );
+
+  assert.deepEqual(newer.wrongLessonIds, ["lesson-z", "lesson-a"]);
+  assert.deepEqual([...newer.wrongLessonIds].reverse(), [
+    "lesson-a",
+    "lesson-z",
+  ]);
+
+  const corrected = recordQuizAnswer(
+    newer,
+    "lesson-a",
+    true,
+    "2026-07-21T12:00:00.000Z",
+  );
+  assert.deepEqual(corrected.wrongLessonIds, ["lesson-z"]);
 });
 
 test("repairs invalid stored study days and refuses to record an invalid day", () => {

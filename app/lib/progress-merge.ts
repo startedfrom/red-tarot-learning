@@ -6,6 +6,8 @@ import {
   isCalendarDay,
   isIsoTimestamp,
   normalizeIsoTimestamp,
+  quizAttemptsWithLegacy,
+  wrongLessonIdsFromAttempts,
   type FavoriteChange,
   type LearningProgress,
   type QuizAttempt,
@@ -200,20 +202,10 @@ export function mergeProgress(
   remote: LearningProgress,
 ): LearningProgress {
   const quizAttempts = mergeQuizAttempts(
-    local.quizAttempts,
-    remote.quizAttempts,
+    quizAttemptsWithLegacy(local.quizAttempts, local.wrongLessonIds),
+    quizAttemptsWithLegacy(remote.quizAttempts, remote.wrongLessonIds),
   );
-  const legacyWrongIds = sortedUnique([
-    ...local.wrongLessonIds,
-    ...remote.wrongLessonIds,
-  ]).filter((lessonId) => !quizAttempts[lessonId]);
-  const timestampedWrongIds = Object.entries(quizAttempts)
-    .filter(([, attempt]) => !attempt.correct)
-    .map(([lessonId]) => lessonId);
-  const wrongLessonIds = sortedUnique([
-    ...legacyWrongIds,
-    ...timestampedWrongIds,
-  ]);
+  const wrongLessonIds = wrongLessonIdsFromAttempts(quizAttempts);
   const studyDays = sortedUnique(
     [...local.studyDays, ...remote.studyDays].filter(isCalendarDay),
   );
