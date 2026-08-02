@@ -4583,13 +4583,28 @@ a {
 }
 
 @media (min-width: 640px) {
+  html:has(.public-home),
+  html:has(.card-article),
+  html:has(.reading-article),
+  html:has(.guide-article),
+  html:has(.reading-directory),
+  html:has(.guide-directory),
+  html:has(.info-page),
+  html:has(.auth-panel),
+  html:has(.course-hero),
+  html:has(.course-day-page),
+  html:has(.review-page),
   body:has(.public-home),
   body:has(.card-article),
   body:has(.reading-article),
   body:has(.guide-article),
   body:has(.reading-directory),
   body:has(.guide-directory),
-  body:has(.info-page) {
+  body:has(.info-page),
+  body:has(.auth-panel),
+  body:has(.course-hero),
+  body:has(.course-day-page),
+  body:has(.review-page) {
     height: auto;
     overflow-x: hidden;
     overflow-y: auto;
@@ -4601,7 +4616,11 @@ a {
   .app-shell:has(.guide-article),
   .app-shell:has(.reading-directory),
   .app-shell:has(.guide-directory),
-  .app-shell:has(.info-page) {
+  .app-shell:has(.info-page),
+  .app-shell:has(.auth-panel),
+  .app-shell:has(.course-hero),
+  .app-shell:has(.course-day-page),
+  .app-shell:has(.review-page) {
     display: block;
     width: min(100%, 1360px);
     height: auto;
@@ -4615,7 +4634,11 @@ a {
   .app-shell:has(.guide-article) #main-content,
   .app-shell:has(.reading-directory) #main-content,
   .app-shell:has(.guide-directory) #main-content,
-  .app-shell:has(.info-page) #main-content {
+  .app-shell:has(.info-page) #main-content,
+  .app-shell:has(.auth-panel) #main-content,
+  .app-shell:has(.course-hero) #main-content,
+  .app-shell:has(.course-day-page) #main-content,
+  .app-shell:has(.review-page) #main-content {
     overflow: visible;
   }
 }

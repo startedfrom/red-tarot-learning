@@ -34,6 +34,30 @@ test("sets baseline response security headers", () => {
   }
 });
 
+test("long pages release the desktop root and main scrolling locks", () => {
+  const styles = read("app/globals.css");
+
+  assert.match(
+    styles,
+    /html:has\(\.public-home\),[\s\S]*?\{[\s\S]*?height:\s*auto;[\s\S]*?overflow-y:\s*auto;/,
+  );
+
+  for (const pageClass of [
+    "public-home",
+    "auth-panel",
+    "course-hero",
+    "course-day-page",
+    "review-page",
+  ]) {
+    assert.match(styles, new RegExp(`html:has\\(\\.${pageClass}\\)`));
+    assert.match(styles, new RegExp(`\\.app-shell:has\\(\\.${pageClass}\\)`));
+    assert.match(
+      styles,
+      new RegExp(`\\.app-shell:has\\(\\.${pageClass}\\) #main-content`),
+    );
+  }
+});
+
 test("CI installs from the lockfile and runs all release checks on Node 24", () => {
   const workflow = read(".github/workflows/ci.yml");
   assert.match(workflow, /node-version:\s*["']?24/);
