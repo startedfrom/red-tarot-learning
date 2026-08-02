@@ -3306,7 +3306,7 @@ a {
     grid-column: 1;
     grid-row: 3;
     padding: 24px 10px 10px;
-    overflow: hidden;
+    overflow: visible;
     border-radius: 22px;
   }
 
@@ -3330,7 +3330,7 @@ a {
   }
 
   .spread-grid.spread-1 .tarot-visual {
-    width: min(170px, 19vh);
+    width: min(160px, 17vh);
   }
 
   .spread-grid.spread-3 .tarot-visual {
@@ -3385,7 +3385,8 @@ a {
   .full-answer {
     min-height: 0;
     padding-top: 10px;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   .interpretation-step > p {

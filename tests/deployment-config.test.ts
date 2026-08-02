@@ -4,6 +4,12 @@ import test from "node:test";
 
 const read = (path: string) => readFileSync(path, "utf8");
 
+function desktopAppStyles(styles: string) {
+  const end = styles.indexOf("@media (prefers-reduced-motion: reduce)");
+  const start = styles.lastIndexOf("@media (min-width: 640px)", end);
+  return styles.slice(start, end);
+}
+
 test("documents every required production environment variable", () => {
   const env = read(".env.example");
   for (const name of [
@@ -56,6 +62,27 @@ test("long pages release the desktop root and main scrolling locks", () => {
       new RegExp(`\\.app-shell:has\\(\\.${pageClass}\\) #main-content`),
     );
   }
+});
+
+test("desktop practice board does not clip its ribbon", () => {
+  const styles = desktopAppStyles(read("app/globals.css"));
+  assert.match(styles, /\.spread-board\s*\{[\s\S]*?overflow:\s*visible;/);
+});
+
+test("desktop practice stage content scrolls instead of being clipped", () => {
+  const styles = desktopAppStyles(read("app/globals.css"));
+  assert.match(
+    styles,
+    /\.interpretation-step,[\s\S]*?\.full-answer\s*\{[\s\S]*?overflow-y:\s*auto;/,
+  );
+});
+
+test("single-card practice fits the desktop board at short heights", () => {
+  const styles = desktopAppStyles(read("app/globals.css"));
+  assert.match(
+    styles,
+    /\.spread-grid\.spread-1 \.tarot-visual\s*\{\s*width:\s*min\(160px, 17vh\);/,
+  );
 });
 
 test("CI installs from the lockfile and runs all release checks on Node 24", () => {
