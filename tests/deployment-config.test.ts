@@ -182,6 +182,12 @@ test("deployment runbook covers Supabase OAuth email and AdSense approval", () =
   assert.match(agentGuide, /Vercel/i);
 });
 
+test("root metadata supports cookie-free AdSense ownership verification", () => {
+  const layout = read("app/layout.tsx");
+  assert.match(layout, /google-adsense-account/);
+  assert.match(layout, /adsenseAccountMeta/);
+});
+
 test("Vercel uses the production Next.js build", () => {
   const vercel = JSON.parse(read("vercel.json")) as {
     framework?: string;

@@ -36,6 +36,16 @@ test("builds ads.txt only from a valid publisher id", () => {
   assert.equal(adsTxtLine(undefined), null);
 });
 
+test("exposes only a valid publisher id for AdSense ownership verification", async () => {
+  const consentModule = (await import("../app/lib/consent")) as Record<string, unknown>;
+
+  assert.equal(typeof consentModule.adsenseAccountMeta, "function");
+  const adsenseAccountMeta = consentModule.adsenseAccountMeta as (value?: string) => string | null;
+  assert.equal(adsenseAccountMeta(publisherId), publisherId);
+  assert.equal(adsenseAccountMeta("pub-1234567890123456"), null);
+  assert.equal(adsenseAccountMeta(undefined), null);
+});
+
 test("analytics requires granted consent and a valid GA4 id", () => {
   assert.equal(canLoadAnalytics("granted", "G-ABC123XYZ"), true);
   assert.equal(canLoadAnalytics("denied", "G-ABC123XYZ"), false);

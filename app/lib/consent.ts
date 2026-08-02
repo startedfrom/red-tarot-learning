@@ -12,6 +12,10 @@ const PUBLISHER_ID = /^ca-pub-(\d{16})$/;
 const SLOT_ID = /^\d{6,20}$/;
 const GA4_ID = /^G-[A-Z0-9]{6,20}$/;
 
+export function adsenseAccountMeta(publisherId?: string): string | null {
+  return PUBLISHER_ID.test(publisherId ?? "") ? publisherId! : null;
+}
+
 function defaultConsent(version: number): StoredConsent {
   return { version, choice: "essential", updatedAt: "" };
 }
