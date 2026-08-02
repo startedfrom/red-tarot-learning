@@ -4663,6 +4663,15 @@ body:has(.public-home) {
     min-height: 44px;
   }
 
+  .consent-settings-button {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    z-index: 1;
+    display: block;
+    margin: -104px 12px 84px auto;
+  }
+
   .public-home,
   .card-article,
   .reading-article,
