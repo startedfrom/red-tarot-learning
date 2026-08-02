@@ -124,6 +124,14 @@ test("home sections use editorial rows instead of repeated rounded cards", () =>
   );
 });
 
+test("header learning link stays a plain navigation item instead of a pill", () => {
+  const styles = read("app/globals.css");
+  assert.match(
+    styles,
+    /\.header-login-link\s*\{[\s\S]*?border-radius:\s*0;[\s\S]*?background:\s*transparent;/,
+  );
+});
+
 test("CI installs from the lockfile and runs all release checks on Node 24", () => {
   const workflow = read(".github/workflows/ci.yml");
   assert.match(workflow, /node-version:\s*["']?24/);
