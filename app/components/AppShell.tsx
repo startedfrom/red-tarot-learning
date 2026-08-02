@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { BookOpen, Home, Layers3, UserRound } from "lucide-react";
+import { BookOpen, CalendarDays, Home, UserRound } from "lucide-react";
 import { AuthStatus } from "./AuthStatus";
 
-type ActiveSection = "home" | "cards" | "readings" | "practice" | "me";
+type ActiveSection = "home" | "cards" | "readings" | "practice" | "course" | "review" | "me";
 
 const navItems = [
   { id: "home", label: "홈", href: "/", Icon: Home },
   { id: "cards", label: "카드", href: "/cards", Icon: BookOpen },
-  { id: "readings", label: "조합", href: "/readings", Icon: Layers3 },
+  { id: "course", label: "코스", href: "/course", Icon: CalendarDays },
   { id: "me", label: "내 학습", href: "/me", Icon: UserRound },
 ] as const;
 
@@ -35,6 +35,7 @@ export function AppShell({
             <Link href="/cards">카드 사전</Link>
             <Link href="/readings">조합 예제</Link>
             <Link href="/guides">기초 가이드</Link>
+            <Link href="/course">14일 코스</Link>
           </div>
           <AuthStatus />
         </header>

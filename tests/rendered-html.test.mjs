@@ -72,6 +72,32 @@ test("offers a login entry from the global header", async () => {
   assert.match(html, />로그인</);
 });
 
+test("renders the fourteen day course introduction", async () => {
+  const response = await render("/course");
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /14일 타로 입문 코스/);
+  assert.match(html, /Day[^<]*<!-- -->1/);
+  assert.match(html, /Day[^<]*<!-- -->14/);
+  assert.match(html, /근거로 읽는 방법/);
+  assert.doesNotMatch(html, /name="robots" content="noindex/);
+});
+
+test("renders a noindex course day and review page", async () => {
+  const dayResponse = await render("/course/day/1");
+  const dayHtml = await dayResponse.text();
+  assert.equal(dayResponse.status, 200);
+  assert.match(dayHtml, /1<!-- -->일차/);
+  assert.match(dayHtml, /오늘의 체크리스트/);
+  assert.match(dayHtml, /name="robots" content="noindex, nofollow"/);
+
+  const reviewResponse = await render("/review");
+  const reviewHtml = await reviewResponse.text();
+  assert.equal(reviewResponse.status, 200);
+  assert.match(reviewHtml, /오답과 복습/);
+  assert.match(reviewHtml, /name="robots" content="noindex, nofollow"/);
+});
+
 test("uses the homepage card filter query on first render", async () => {
   const response = await render("/cards?type=major");
   const html = await response.text();
