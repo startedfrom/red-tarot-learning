@@ -28,7 +28,7 @@ test("renders the Red Tarot home instead of the starter", async () => {
 
   assert.equal(response.status, 200);
   assert.match(html, /빨강타로/);
-  assert.match(html, /어떤 카드가 궁금하세요/);
+  assert.match(html, /카드를 찾고/);
   assert.match(html, /카드 이름·키워드·궁금한 해석 검색/);
   assert.match(html, /처음엔 이 카드부터/);
   assert.match(html, /초보자 인기 가이드/);
@@ -42,6 +42,21 @@ test("renders the Red Tarot home instead of the starter", async () => {
   );
 });
 
+test("presents the home search as a compact card index instead of a generic landing card", async () => {
+  const response = await render("/");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /카드를 찾고/);
+  assert.match(html, /근거를 따라 읽어요/);
+  assert.match(html, /입문자들이 먼저 찾는 카드/);
+  assert.match(html, /class="search-hero-index"/);
+  assert.match(html, /연인 정방향/);
+  assert.match(html, /죽음 정방향/);
+  assert.match(html, /탑 정방향/);
+  assert.doesNotMatch(html, /78 CARDS · 150 PRACTICE SETS/);
+});
+
 test("keeps the local learning dashboard at /me", async () => {
   const response = await render("/me");
   const html = await response.text();
@@ -52,24 +67,24 @@ test("keeps the local learning dashboard at /me", async () => {
   assert.match(html, /name="robots" content="noindex, nofollow"/);
 });
 
-test("renders Google Kakao and email login with a no-config recovery path", async () => {
+test("renders an honest local-save recovery path when auth is not configured", async () => {
   const response = await render("/login?next=%2Fme");
   const html = await response.text();
 
   assert.equal(response.status, 200);
-  assert.match(html, /로그인하고 학습 기록 저장하기/);
-  assert.match(html, /Google로 계속하기/);
-  assert.match(html, /Kakao로 계속하기/);
-  assert.match(html, /이메일로 코드 받기/);
-  assert.match(html, /운영 연결 준비 중/);
+  assert.match(html, /학습 기록은 이 기기에 저장돼요/);
+  assert.match(html, /계정 연결은 준비 중/);
   assert.match(html, /로그인하지 않고 계속 학습/);
+  assert.doesNotMatch(html, /Google로 계속하기/);
+  assert.doesNotMatch(html, /Kakao로 계속하기/);
+  assert.doesNotMatch(html, /이메일로 코드 받기/);
   assert.match(html, /name="robots" content="noindex, nofollow"/);
 });
 
-test("offers a login entry from the global header", async () => {
+test("offers local learning from the global header when auth is unavailable", async () => {
   const html = await (await render("/cards")).text();
-  assert.match(html, /href="\/login\?next=%2Fme"/);
-  assert.match(html, />로그인</);
+  assert.match(html, /href="\/me"[^>]*>내 학습</);
+  assert.doesNotMatch(html, /href="\/login\?next=%2Fme"/);
 });
 
 test("renders the fourteen day course introduction", async () => {

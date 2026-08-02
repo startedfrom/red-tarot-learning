@@ -14,18 +14,45 @@ export function PublicHome() {
   return (
     <div className="public-home">
       <section className="search-hero" aria-labelledby="search-hero-title">
-        <span className="eyebrow">78 CARDS · 150 PRACTICE SETS</span>
-        <h1 id="search-hero-title">어떤 카드가 궁금하세요?</h1>
-        <p>외우지 말고, 카드의 동사와 배열 위치를 연결해서 읽어보세요.</p>
-        <SiteSearch />
-        <div className="quick-search-links" aria-label="카드 종류 바로가기">
-          <Link href="/cards">전체</Link>
-          <Link href="/cards?type=major">메이저</Link>
-          <Link href="/cards?type=wands">완드</Link>
-          <Link href="/cards?type=cups">컵</Link>
-          <Link href="/cards?type=swords">소드</Link>
-          <Link href="/cards?type=pentacles">펜타클</Link>
+        <div className="search-hero-copy">
+          <div className="search-hero-register" aria-label="서비스 규모">
+            <span className="eyebrow">타로 카드 도감</span>
+            <span>78장 · 연습 150개</span>
+          </div>
+          <h1 id="search-hero-title">
+            <span>카드를 찾고,</span>
+            <span>근거를 따라 읽어요.</span>
+          </h1>
+          <p>카드 이름이나 키워드를 검색하세요. 정·역방향의 뜻부터 배열 속 역할까지 한 번에 이어집니다.</p>
+          <SiteSearch />
+          <div className="quick-search-links" aria-label="카드 종류 바로가기">
+            <Link href="/cards">전체</Link>
+            <Link href="/cards?type=major">메이저</Link>
+            <Link href="/cards?type=wands">완드</Link>
+            <Link href="/cards?type=cups">컵</Link>
+            <Link href="/cards?type=swords">소드</Link>
+            <Link href="/cards?type=pentacles">펜타클</Link>
+          </div>
         </div>
+
+        <aside className="search-hero-index" aria-label="입문자들이 먼저 찾는 카드">
+          <header>
+            <span>시작 카드</span>
+            <strong>입문자들이 먼저 찾는 카드</strong>
+          </header>
+          <div className="search-hero-deck">
+            {popularCards.map((card, index) => (
+              <Link href={`/cards/${card.id}`} key={card.id} aria-label={`${card.nameKo} 카드 뜻 보기`}>
+                <span className="search-hero-card-number">0{index + 1}</span>
+                <TarotCardVisual card={card} size="small" />
+                <span className="search-hero-card-name">{card.nameKo}</span>
+              </Link>
+            ))}
+          </div>
+          <Link className="search-hero-index-link" href="/cards">
+            78장 전체 도감 <ArrowRight aria-hidden="true" />
+          </Link>
+        </aside>
       </section>
 
       <section className="public-section" aria-labelledby="popular-cards-title">

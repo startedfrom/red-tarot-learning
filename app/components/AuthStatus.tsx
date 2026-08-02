@@ -7,6 +7,7 @@ import { createBrowserSupabaseClient } from "../lib/supabase/client";
 
 export function AuthStatus() {
   const [user, setUser] = useState<User | null>(null);
+  const authAvailable = createBrowserSupabaseClient() !== null;
 
   useEffect(() => {
     const client = createBrowserSupabaseClient();
@@ -24,6 +25,14 @@ export function AuthStatus() {
       data.subscription.unsubscribe();
     };
   }, []);
+
+  if (!authAvailable) {
+    return (
+      <Link className="header-login-link" href="/me">
+        내 학습
+      </Link>
+    );
+  }
 
   if (!user) {
     return (

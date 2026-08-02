@@ -94,6 +94,20 @@ test("single-card practice fits the desktop board at short heights", () => {
   );
 });
 
+test("home search hero uses an open editorial layout without ornamental circles", () => {
+  const styles = read("app/globals.css");
+  assert.match(
+    styles,
+    /\.search-hero\s*\{[\s\S]*?display:\s*grid;/,
+  );
+  assert.match(
+    styles,
+    /@media \(min-width: 860px\)[\s\S]*?\.search-hero\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) minmax\(220px, 0\.42fr\);/,
+  );
+  assert.match(styles, /\.search-hero-index\s*\{/);
+  assert.doesNotMatch(styles, /\.search-hero::after\s*\{/);
+});
+
 test("CI installs from the lockfile and runs all release checks on Node 24", () => {
   const workflow = read(".github/workflows/ci.yml");
   assert.match(workflow, /node-version:\s*["']?24/);
