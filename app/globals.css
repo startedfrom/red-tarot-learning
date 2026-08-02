@@ -3614,11 +3614,15 @@ body:has(.public-home) {
   padding: var(--space-3xl) 0 120px;
 }
 
+.public-home {
+  padding-top: 20px;
+}
+
 .search-hero {
   position: relative;
   display: grid;
   gap: var(--space-3xl);
-  padding: var(--space-2xl) 0 var(--space-4xl);
+  padding: var(--space-xl) 0 var(--space-3xl);
   border-bottom: 1px solid var(--public-line);
   text-align: left;
 }
@@ -3631,7 +3635,7 @@ body:has(.public-home) {
 .search-hero-copy > p,
 .search-hero-copy h1,
 .search-hero .site-search,
-.quick-search-links {
+.search-hero-actions {
   width: min(720px, 100%);
 }
 
@@ -3801,15 +3805,16 @@ body:has(.public-home) {
   line-height: 1.6;
 }
 
-.quick-search-links {
+.search-hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-xs) var(--space-lg);
-  margin-top: var(--space-lg);
+  gap: var(--space-sm) var(--space-xl);
+  margin-top: var(--space-xl);
 }
 
-.quick-search-links a {
+.search-hero-actions a {
   display: inline-flex;
+  gap: var(--space-sm);
   min-height: 40px;
   align-items: center;
   padding: 0;
@@ -3820,53 +3825,70 @@ body:has(.public-home) {
   transition: border-color 160ms var(--ease-out-quart), color 160ms var(--ease-out-quart);
 }
 
-.quick-search-links a:hover,
-.quick-search-links a:focus-visible {
+.search-hero-actions a:last-child {
+  color: var(--public-muted);
+}
+
+.search-hero-actions a svg {
+  width: 16px;
+  transition: transform 160ms var(--ease-out-quart);
+}
+
+.search-hero-actions a:hover,
+.search-hero-actions a:focus-visible {
   border-color: currentColor;
   color: var(--public-ink);
 }
 
-.search-hero-index {
+.search-hero-actions a:hover svg,
+.search-hero-actions a:focus-visible svg {
+  transform: translateX(3px);
+}
+
+.search-hero-example {
   display: grid;
   align-content: start;
-  gap: var(--space-xl);
+  gap: var(--space-lg);
   padding: var(--space-xl) 0 0;
   border-top: 1px solid var(--public-line);
 }
 
-.search-hero-index header {
+.search-hero-example header {
   display: grid;
   gap: var(--space-xs);
 }
 
-.search-hero-index header span {
+.search-hero-example header span {
   color: var(--public-cherry);
   font-size: 0.7rem;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
 
-.search-hero-index header strong {
+.search-hero-example header strong {
   font-size: 1rem;
   letter-spacing: -0.025em;
+  line-height: 1.45;
 }
 
-.search-hero-deck {
+.search-hero-flow {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: end;
-  gap: var(--space-sm);
+  align-items: start;
+  gap: var(--space-lg);
+  padding-top: var(--space-sm);
 }
 
-.search-hero-deck > a {
+.search-hero-flow-step {
+  position: relative;
   display: grid;
   min-width: 0;
   justify-items: center;
   gap: var(--space-sm);
 }
 
-.search-hero-deck .tarot-visual {
-  width: min(88px, 100%);
+.search-hero-flow .tarot-visual {
+  width: min(78px, 100%);
 }
 
 .search-hero-card-number {
@@ -3879,12 +3901,51 @@ body:has(.public-home) {
   font-weight: 800;
 }
 
-.search-hero-card-name {
-  font-size: 0.8rem;
+.search-hero-flow-step > strong {
+  color: var(--public-cherry-dark);
+  font-size: 0.76rem;
   font-weight: 900;
+  line-height: 1.35;
+  text-align: center;
 }
 
-.search-hero-index-link {
+.search-hero-flow-arrow {
+  position: absolute;
+  top: 52%;
+  right: calc(var(--space-lg) * -1);
+  width: 14px;
+  color: var(--public-muted);
+  transform: translate(50%, -50%);
+}
+
+.search-hero-connection {
+  display: grid;
+  gap: 5px;
+  padding: var(--space-md) 0 var(--space-md) var(--space-lg);
+  border-left: 3px solid var(--public-cherry);
+}
+
+.search-hero-connection > span {
+  color: var(--public-muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.search-hero-connection > strong {
+  color: var(--public-ink);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.search-hero-connection > p {
+  margin: 0;
+  color: var(--public-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.search-hero-example-link {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -3897,25 +3958,25 @@ body:has(.public-home) {
   font-weight: 900;
 }
 
-.search-hero-index-link svg {
+.search-hero-example-link svg {
   width: 17px;
   transition: transform 160ms var(--ease-out-quart);
 }
 
-.search-hero-index-link:hover svg,
-.search-hero-index-link:focus-visible svg {
+.search-hero-example-link:hover svg,
+.search-hero-example-link:focus-visible svg {
   transform: translateX(3px);
 }
 
 @media (min-width: 860px) {
   .search-hero {
-    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.42fr);
-    align-items: center;
-    gap: clamp(48px, 8vw, 96px);
-    padding: var(--space-4xl) 0 72px;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.48fr);
+    align-items: start;
+    gap: clamp(44px, 6vw, 72px);
+    padding: 36px 0 56px;
   }
 
-  .search-hero-index {
+  .search-hero-example {
     padding: 0 0 0 var(--space-2xl);
     border-top: 0;
     border-left: 1px solid var(--public-line);
@@ -4554,6 +4615,12 @@ body:has(.public-home) {
   .consent-banner {
     align-items: stretch;
     flex-direction: column;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: 12px;
+    width: min(calc(100% - 24px), 900px);
+    gap: 14px;
+    padding: 16px;
   }
 
   .consent-actions {
@@ -4566,18 +4633,12 @@ body:has(.public-home) {
   }
 }
 
-@media (max-width: 420px) {
-  .consent-actions {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 800px) {
   .skip-link,
   .brand,
   .detail-breadcrumb a,
   .section-heading > a,
-  .quick-search-links a,
+  .search-hero-actions a,
   .site-footer a {
     min-width: 44px;
     min-height: 44px;
@@ -4613,8 +4674,14 @@ body:has(.public-home) {
     padding-top: var(--space-xl);
   }
 
+  .public-home {
+    padding-top: var(--space-sm);
+  }
+
   .search-hero {
-    padding-top: var(--space-xl);
+    gap: var(--space-2xl);
+    padding-top: var(--space-lg);
+    padding-bottom: 40px;
   }
 
   .search-hero-copy h1 {
@@ -4700,8 +4767,8 @@ body:has(.public-home) {
     max-height: 54vh;
   }
 
-  .quick-search-links {
-    margin-top: var(--space-xl);
+  .search-hero-actions {
+    margin-top: var(--space-lg);
   }
 
   .site-footer {

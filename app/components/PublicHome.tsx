@@ -7,8 +7,12 @@ import { SiteSearch } from "./SiteSearch";
 import { TarotCardVisual } from "./TarotCardVisual";
 import { AdSlot } from "./AdSlot";
 
-const popularCardIds = ["the-lovers", "death", "the-tower"];
-const popularCards = popularCardIds.map((id) => allCards.find((card) => card.id === id)!);
+const heroReading = publicReadings[0];
+const heroCards = heroReading.cards.map(({ cardId, orientation }) => ({
+  card: allCards.find((card) => card.id === cardId)!,
+  orientation,
+}));
+const heroSteps = heroReading.connection.split(" → ");
 
 export function PublicHome() {
   return (
@@ -16,41 +20,43 @@ export function PublicHome() {
       <section className="search-hero" aria-labelledby="search-hero-title">
         <div className="search-hero-copy">
           <div className="search-hero-register" aria-label="서비스 규모">
-            <span className="eyebrow">타로 카드 도감</span>
+            <span className="eyebrow">외우지 않는 타로 학습</span>
             <span>78장 · 연습 150개</span>
           </div>
           <h1 id="search-hero-title">
             <span>카드를 찾고,</span>
             <span>근거를 따라 읽어요.</span>
           </h1>
-          <p>카드 이름이나 키워드를 검색하세요. 정·역방향의 뜻부터 배열 속 역할까지 한 번에 이어집니다.</p>
+          <p>카드 이름이나 키워드로 뜻을 찾고, 실제 배열에서 그 뜻이 어떻게 한 문장으로 이어지는지 확인하세요.</p>
           <SiteSearch />
-          <div className="quick-search-links" aria-label="카드 종류 바로가기">
-            <Link href="/cards">전체</Link>
-            <Link href="/cards?type=major">메이저</Link>
-            <Link href="/cards?type=wands">완드</Link>
-            <Link href="/cards?type=cups">컵</Link>
-            <Link href="/cards?type=swords">소드</Link>
-            <Link href="/cards?type=pentacles">펜타클</Link>
+          <div className="search-hero-actions" aria-label="바로 시작하기">
+            <Link href="/cards">78장 전체 보기 <ArrowRight aria-hidden="true" /></Link>
+            <Link href={`/practice/${heroReading.id}`}>첫 연습 시작 <ArrowRight aria-hidden="true" /></Link>
           </div>
         </div>
 
-        <aside className="search-hero-index" aria-label="입문자들이 먼저 찾는 카드">
+        <aside className="search-hero-example" aria-label="세 장의 카드를 한 문장으로 연결하는 예시">
           <header>
-            <span>시작 카드</span>
-            <strong>입문자들이 먼저 찾는 카드</strong>
+            <span>세 장을 한 문장으로</span>
+            <strong>카드 뜻 사이의 흐름을 읽어보세요</strong>
           </header>
-          <div className="search-hero-deck">
-            {popularCards.map((card, index) => (
-              <Link href={`/cards/${card.id}`} key={card.id} aria-label={`${card.nameKo} 카드 뜻 보기`}>
+          <div className="search-hero-flow" aria-label={heroReading.connection}>
+            {heroCards.map(({ card, orientation }, index) => (
+              <div className="search-hero-flow-step" key={card.id}>
                 <span className="search-hero-card-number">0{index + 1}</span>
-                <TarotCardVisual card={card} size="small" />
-                <span className="search-hero-card-name">{card.nameKo}</span>
-              </Link>
+                <TarotCardVisual card={card} orientation={orientation} size="small" />
+                <strong>{heroSteps[index]}</strong>
+                {index < heroCards.length - 1 ? <ArrowRight className="search-hero-flow-arrow" aria-hidden="true" /> : null}
+              </div>
             ))}
           </div>
-          <Link className="search-hero-index-link" href="/cards">
-            78장 전체 도감 <ArrowRight aria-hidden="true" />
+          <div className="search-hero-connection">
+            <span>흐름</span>
+            <strong>{heroReading.connection}</strong>
+            <p>{heroReading.headline}</p>
+          </div>
+          <Link className="search-hero-example-link" href={`/readings/${heroReading.id}`}>
+            이 조합의 근거 보기 <ArrowRight aria-hidden="true" />
           </Link>
         </aside>
       </section>

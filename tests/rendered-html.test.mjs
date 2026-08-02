@@ -53,18 +53,21 @@ test("keeps the home editorial and focused instead of repeating card grids", asy
   assert.doesNotMatch(html, /안전하고 책임 있게 타로를 읽는 기준/);
 });
 
-test("presents the home search as a compact card index instead of a generic landing card", async () => {
+test("shows how three card meanings become one reading from the home search", async () => {
   const response = await render("/");
   const html = await response.text();
 
   assert.equal(response.status, 200);
   assert.match(html, /카드를 찾고/);
   assert.match(html, /근거를 따라 읽어요/);
-  assert.match(html, /입문자들이 먼저 찾는 카드/);
-  assert.match(html, /class="search-hero-index"/);
+  assert.match(html, /세 장을 한 문장으로/);
+  assert.match(html, /class="search-hero-example"/);
   assert.match(html, /연인 정방향/);
-  assert.match(html, /죽음 정방향/);
-  assert.match(html, /탑 정방향/);
+  assert.match(html, /소드 2 정방향/);
+  assert.match(html, /컵 8 정방향/);
+  assert.match(html, /끌림과 선택 → 결정 유보 → 거리두기/);
+  assert.match(html, /class="search-hero-actions"/);
+  assert.doesNotMatch(html, /class="quick-search-links"/);
   assert.doesNotMatch(html, /78 CARDS · 150 PRACTICE SETS/);
 });
 

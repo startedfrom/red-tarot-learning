@@ -94,7 +94,7 @@ test("single-card practice fits the desktop board at short heights", () => {
   );
 });
 
-test("home search hero uses an open editorial layout without ornamental circles", () => {
+test("home search hero uses an open reading flow without ornamental circles", () => {
   const styles = read("app/globals.css");
   assert.match(
     styles,
@@ -102,9 +102,10 @@ test("home search hero uses an open editorial layout without ornamental circles"
   );
   assert.match(
     styles,
-    /@media \(min-width: 860px\)[\s\S]*?\.search-hero\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) minmax\(220px, 0\.42fr\);/,
+    /@media \(min-width: 860px\)[\s\S]*?\.search-hero\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) minmax\(300px, 0\.48fr\);/,
   );
-  assert.match(styles, /\.search-hero-index\s*\{/);
+  assert.match(styles, /\.search-hero-example\s*\{/);
+  assert.match(styles, /\.search-hero-flow\s*\{/);
   assert.doesNotMatch(styles, /\.search-hero::after\s*\{/);
 });
 
