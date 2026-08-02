@@ -30,9 +30,8 @@ test("renders the Red Tarot home instead of the starter", async () => {
   assert.match(html, /빨강타로/);
   assert.match(html, /카드를 찾고/);
   assert.match(html, /카드 이름·키워드·궁금한 해석 검색/);
-  assert.match(html, /처음엔 이 카드부터/);
-  assert.match(html, /초보자 인기 가이드/);
-  assert.match(html, /카드를 함께 읽어봐요/);
+  assert.match(html, /처음 배우는 순서/);
+  assert.match(html, /읽기와 직접 풀기/);
   assert.match(html, /첫 연습 시작/);
   assert.match(html, /lang="ko"/);
   assert.doesNotMatch(html, /나의 학습 정원/);
@@ -40,6 +39,18 @@ test("renders the Red Tarot home instead of the starter", async () => {
     html,
     /Your site is taking shape|codex-preview|react-loading-skeleton/i,
   );
+});
+
+test("keeps the home editorial and focused instead of repeating card grids", async () => {
+  const html = await (await render("/")).text();
+  const guideLinks = html.match(/href="\/guides\/[^"]+"/g) ?? [];
+
+  assert.equal(guideLinks.length, 3);
+  assert.match(html, /class="home-guide-list"/);
+  assert.match(html, /class="home-action-list"/);
+  assert.doesNotMatch(html, /class="popular-card-grid"/);
+  assert.doesNotMatch(html, /POPULAR CARDS|BEGINNER GUIDES|READING EXAMPLES|FREE PRACTICE/);
+  assert.doesNotMatch(html, /안전하고 책임 있게 타로를 읽는 기준/);
 });
 
 test("presents the home search as a compact card index instead of a generic landing card", async () => {

@@ -108,6 +108,22 @@ test("home search hero uses an open editorial layout without ornamental circles"
   assert.doesNotMatch(styles, /\.search-hero::after\s*\{/);
 });
 
+test("home sections use editorial rows instead of repeated rounded cards", () => {
+  const styles = read("app/globals.css");
+  assert.match(
+    styles,
+    /\.home-guide-list\s*>\s*a\s*\{[\s\S]*?grid-template-columns:[\s\S]*?border-bottom:\s*1px solid var\(--public-line\);/,
+  );
+  assert.match(
+    styles,
+    /\.home-action-list\s*>\s*a\s*\{[\s\S]*?border-top:\s*1px solid var\(--public-ink\);/,
+  );
+  assert.match(
+    styles,
+    /body:has\(\.public-home\)\s*\{[\s\S]*?background:\s*var\(--public-paper\);/,
+  );
+});
+
 test("CI installs from the lockfile and runs all release checks on Node 24", () => {
   const workflow = read(".github/workflows/ci.yml");
   assert.match(workflow, /node-version:\s*["']?24/);

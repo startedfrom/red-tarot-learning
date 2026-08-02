@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpenCheck, Compass, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { allCards } from "../data/cards";
 import { guides } from "../data/guides";
@@ -55,48 +55,47 @@ export function PublicHome() {
         </aside>
       </section>
 
-      <section className="public-section" aria-labelledby="popular-cards-title">
-        <div className="section-heading">
-          <div><span className="eyebrow">POPULAR CARDS</span><h2 id="popular-cards-title">처음엔 이 카드부터</h2></div>
-          <Link href="/cards">78장 모두 보기 <ArrowRight aria-hidden="true" /></Link>
-        </div>
-        <div className="popular-card-grid">
-          {popularCards.map((card) => (
-            <Link href={`/cards/${card.id}`} key={card.id}>
-              <TarotCardVisual card={card} size="small" />
-              <span><strong>{card.nameKo}</strong><small>{card.coreVerb}</small></span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       <AdSlot placement="home" />
 
-      <section className="public-section" aria-labelledby="guide-title">
+      <section className="public-section home-guides" aria-labelledby="guide-title">
         <div className="section-heading">
-          <div><span className="eyebrow">BEGINNER GUIDES</span><h2 id="guide-title">초보자 인기 가이드</h2></div>
-          <Compass aria-hidden="true" />
+          <div><span className="eyebrow">처음 배우는 순서</span><h2 id="guide-title">세 가지만 먼저 익혀보세요</h2></div>
+          <Link href="/guides">가이드 모두 보기 <ArrowRight aria-hidden="true" /></Link>
         </div>
-        <div className="guide-preview-grid">
-          {guides.map((guide, index) => (
+        <div className="home-guide-list">
+          {guides.slice(0, 3).map((guide, index) => (
             <Link href={`/guides/${guide.slug}`} key={guide.slug}>
               <span className="guide-number">0{index + 1}</span>
               <strong>{guide.title}</strong>
               <p>{guide.description}</p>
+              <ArrowRight aria-hidden="true" />
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="public-section reading-preview" aria-labelledby="reading-title">
-        <div><span className="eyebrow">READING EXAMPLES</span><h2 id="reading-title">카드를 함께 읽어봐요</h2><p>{publicReadings[0].question}</p></div>
-        <Link className="primary-button" href={`/readings/${publicReadings[0].id}`}>조합 해석 보기 <ArrowRight aria-hidden="true" /></Link>
-      </section>
-
-      <section className="public-section course-preview" aria-labelledby="study-title">
-        <div className="course-preview-icon"><Sparkles aria-hidden="true" /></div>
-        <div><span className="eyebrow">FREE PRACTICE</span><h2 id="study-title">직접 읽어보면 더 빨리 배워요</h2><p>먼저 내 말로 해석하고 카드별 근거와 모범 해설을 차례로 확인하세요.</p></div>
-        <Link className="secondary-button" href="/practice/love-three-001"><BookOpenCheck aria-hidden="true" /> 첫 연습 시작</Link>
+      <section className="public-section home-actions" aria-labelledby="home-actions-title">
+        <div className="section-heading">
+          <div><span className="eyebrow">읽기와 직접 풀기</span><h2 id="home-actions-title">배운 내용을 바로 써봐요</h2></div>
+        </div>
+        <div className="home-action-list">
+          <Link href={`/readings/${publicReadings[0].id}`}>
+            <span className="home-action-index">01</span>
+            <span className="home-action-copy">
+              <strong>조합 해석 한 편 읽기</strong>
+              <span>{publicReadings[0].question}</span>
+            </span>
+            <span className="home-action-link">해석 보기 <ArrowRight aria-hidden="true" /></span>
+          </Link>
+          <Link href="/practice/love-three-001">
+            <span className="home-action-index">02</span>
+            <span className="home-action-copy">
+              <strong>내 말로 먼저 풀어보기</strong>
+              <span>세 장의 흐름을 적고 카드별 근거와 모범 해설을 차례로 확인하세요.</span>
+            </span>
+            <span className="home-action-link">첫 연습 시작 <ArrowRight aria-hidden="true" /></span>
+          </Link>
+        </div>
       </section>
     </div>
   );
