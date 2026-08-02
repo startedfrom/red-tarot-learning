@@ -7,15 +7,16 @@ import {
   publicReadings,
 } from "../app/lib/public-content";
 
-test("ships three reviewed beginner guides in the foundation slice", () => {
-  assert.equal(guides.length, 3);
-  assert.equal(new Set(guides.map((guide) => guide.slug)).size, 3);
+test("ships twelve reviewed beginner guides", () => {
+  assert.equal(guides.length, 12);
+  assert.equal(new Set(guides.map((guide) => guide.slug)).size, 12);
 
   for (const guide of guides) {
     assert.ok(guide.title.length >= 8);
     assert.ok(guide.description.length >= 30);
     assert.ok(guide.lead.length >= 40);
     assert.ok(guide.sections.length >= 3);
+    assert.ok(guide.relatedCardIds.length >= 3);
     assert.equal(getGuide(guide.slug)?.slug, guide.slug);
 
     for (const section of guide.sections) {
