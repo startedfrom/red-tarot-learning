@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
+import { ProgressProvider } from "./components/ProgressProvider";
 
 const title = "빨강타로 — 외우지 말고 읽는 타로 학습";
 const description =
@@ -60,7 +61,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body><ProgressProvider>{children}</ProgressProvider></body>
     </html>
   );
 }

@@ -11,34 +11,17 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { allCards, majorArcana, type Category } from "../data/cards";
 import { getLessonCard, learningSets } from "../data/learning-sets";
-import {
-  defaultProgress,
-  safeReadProgress,
-  type LearningProgress,
-} from "../lib/progress";
+import { useProgress } from "../hooks/use-progress";
 import { TarotCardVisual } from "./TarotCardVisual";
 
 const dailyCard = majorArcana.find((card) => card.id === "the-lovers")!;
 const firstLesson = learningSets[0];
 
 export function HomeDashboard() {
-  const [progress, setProgress] = useState<LearningProgress>(defaultProgress);
-  const [storageAvailable, setStorageAvailable] = useState(true);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      try {
-        setProgress(safeReadProgress(window.localStorage));
-      } catch {
-        setStorageAvailable(false);
-      }
-    }, 0);
-
-    return () => window.clearTimeout(timer);
-  }, []);
+  const { progress, storageAvailable, syncMessage, userId } = useProgress();
 
   const completedLessons = useMemo(
     () =>
@@ -99,6 +82,9 @@ export function HomeDashboard() {
           수 있습니다.
         </p>
       ) : null}
+      <p className="sync-message" role="status">
+        {userId ? syncMessage : "로그인하면 다른 기기에서도 이 기록을 이어볼 수 있어요."}
+      </p>
 
       <section className="home-greeting">
         <div>
