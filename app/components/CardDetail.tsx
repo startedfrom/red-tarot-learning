@@ -5,6 +5,7 @@ import { publicReadings } from "../lib/public-content";
 import { FavoriteButton } from "./FavoriteButton";
 import { LongFormContents } from "./LongFormContents";
 import { SafetyNote } from "./SafetyNote";
+import { AdSlot } from "./AdSlot";
 import { TarotCardVisual } from "./TarotCardVisual";
 
 const categoryLabels = { love: "연애", money: "재물", health: "건강" } as const;
@@ -52,6 +53,8 @@ export function CardDetail({ card }: { card: TarotCard }) {
         <section className="orientation-card" id="upright"><span className="soft-pill">정방향</span><h2>{card.upright.summary}</h2><h3>잘 표현될 때</h3><ul>{card.upright.positive.map((item) => <li key={item}>{item}</li>)}</ul><h3>주의할 점</h3><ul>{card.upright.caution.map((item) => <li key={item}>{item}</li>)}</ul></section>
         <section className="orientation-card reversed-card" id="reversed"><span className="dark-pill">역방향 · {card.reversed.mode}</span><h2>{card.reversed.summary}</h2><h3>다시 볼 가능성</h3><ul>{card.reversed.positive.map((item) => <li key={item}>{item}</li>)}</ul><h3>주의할 점</h3><ul>{card.reversed.caution.map((item) => <li key={item}>{item}</li>)}</ul></section>
       </div>
+
+      <AdSlot placement="card" />
 
       <section className="article-section" id="categories"><span className="panel-label">질문 분야에 맞춰 읽기</span><h2>분야별 의미</h2><div className="category-article-grid">{Object.entries(categoryLabels).map(([key, label]) => { const category = key as keyof typeof card.categories; return <section key={key}><h3>{`${label}에서 읽기`}</h3><p><strong>정방향</strong> {card.categories[category].upright}</p><p><strong>역방향</strong> {card.categories[category].reversed}</p>{category === "health" ? <SafetyNote /> : null}</section>; })}</div></section>
 

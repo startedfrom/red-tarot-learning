@@ -5,6 +5,7 @@ import type { LearningSet } from "../data/learning-sets";
 import { LongFormContents } from "./LongFormContents";
 import { SafetyNote } from "./SafetyNote";
 import { TarotCardVisual } from "./TarotCardVisual";
+import { AdSlot } from "./AdSlot";
 
 const categoryLabel = { love: "연애", money: "재물", health: "건강" } as const;
 
@@ -19,6 +20,7 @@ export function ReadingArticle({ reading, cards }: { reading: LearningSet; cards
       <section className="article-section" id="card-evidence"><span className="panel-label">STEP 1</span><h2>카드별 핵심 근거</h2><div className="evidence-list">{cards.map((card, index) => <section key={card.id}><span>{index + 1}</span><div><h3>{card.nameKo} · {card.coreVerb}</h3><p>{reading.cardAnalysis[index]}</p></div></section>)}</div></section>
       <section className="article-section" id="position-evidence"><span className="panel-label">STEP 2</span><h2>위치에 맞춰 읽기</h2><div className="evidence-list">{reading.positionAnalysis.map((analysis, index) => <section key={reading.spread.positions[index]}><span>{index + 1}</span><div><h3>{reading.spread.positions[index]}</h3><p>{analysis}</p></div></section>)}</div></section>
       <section className="article-section reading-conclusion" id="full-reading"><span className="relationship-pill">{reading.relationship}</span><h2>{reading.headline}</h2><p className="connection-line">{reading.connection}</p><p>{reading.fullInterpretation}</p></section>
+      <AdSlot placement="article" />
       <section className="article-section alternative-grid" id="alternatives"><div><span>가능한 대안</span><p>{reading.alternatives[0]}</p></div><div><span>달라지는 조건</span><p>{reading.conditions[0]}</p></div><div><span>흔한 오해</span><p>{reading.commonMistakes[0]}</p></div></section>
       <Link className="primary-button reading-practice-link" href={`/practice/${reading.id}`}><BookOpenCheck aria-hidden="true" /> 같은 조합 직접 풀기 <ArrowRight aria-hidden="true" /></Link>
     </article>

@@ -5,6 +5,7 @@ import { guides } from "../data/guides";
 import { publicReadings } from "../lib/public-content";
 import { SiteSearch } from "./SiteSearch";
 import { TarotCardVisual } from "./TarotCardVisual";
+import { AdSlot } from "./AdSlot";
 
 const popularCardIds = ["the-lovers", "death", "the-tower"];
 const popularCards = popularCardIds.map((id) => allCards.find((card) => card.id === id)!);
@@ -41,6 +42,8 @@ export function PublicHome() {
           ))}
         </div>
       </section>
+
+      <AdSlot placement="home" />
 
       <section className="public-section" aria-labelledby="guide-title">
         <div className="section-heading">

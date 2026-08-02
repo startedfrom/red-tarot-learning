@@ -1,4 +1,43 @@
 import type { Metadata } from "next";
 import { InfoPage } from "../../components/InfoPage";
 export const metadata: Metadata = { title: "개인정보처리방침", alternates: { canonical: "/privacy" } };
-export default function PrivacyPage() { return <InfoPage title="개인정보처리방침" lead="현재 공개 버전은 계정 정보를 수집하지 않으며 학습 기록을 사용자의 브라우저에 저장합니다." sections={[{ heading: "브라우저에 저장되는 정보", paragraphs: ["완료한 학습, 오답 학습, 즐겨찾기 카드, 마지막 학습 위치, 연속 학습일을 localStorage에 저장합니다. 이 정보는 현재 다른 기기와 공유되지 않습니다."] }, { heading: "서비스 운영 과정의 정보", paragraphs: ["호스팅 제공자는 보안과 안정적인 전송을 위해 일반적인 접속 로그를 처리할 수 있습니다. 빨강타로는 현재 광고나 별도 분석 쿠키를 활성화하지 않습니다."] }, { heading: "삭제 방법", paragraphs: ["브라우저의 사이트 데이터 또는 localStorage를 삭제하면 이 기기에 저장된 학습 기록이 삭제됩니다. 계정 동기화와 광고가 추가되기 전 이 방침을 실제 처리 구조에 맞춰 다시 고지합니다."] }]} />; }
+export default function PrivacyPage() {
+  return (
+    <InfoPage
+      title="개인정보처리방침"
+      lead="빨강타로는 학습 기록 저장과 계정 동기화에 필요한 정보만 처리하며, 광고·분석 기능은 사용자가 동의한 뒤에만 불러옵니다."
+      sections={[
+        {
+          heading: "기기에 저장되는 학습 기록",
+          paragraphs: [
+            "완료한 학습, 퀴즈 결과, 즐겨찾기, 학습일과 진행 상태를 브라우저 localStorage에 저장합니다. 로그인하지 않아도 이 기기에서 기록이 유지됩니다.",
+          ],
+        },
+        {
+          heading: "로그인과 기기 간 동기화",
+          paragraphs: [
+            "Google, Kakao 또는 이메일로 로그인하면 Supabase가 계정 식별자, 이메일, 프로필 표시 정보와 학습 기록을 처리합니다. 저장된 학습 기록은 본인 계정으로만 읽고 변경할 수 있도록 접근 정책을 적용합니다.",
+          ],
+        },
+        {
+          heading: "Google 광고와 방문 통계",
+          paragraphs: [
+            "사용자가 '동의하고 계속'을 선택하고 운영 계정 설정이 완료된 경우에만 Google AdSense와 Google Analytics 4 스크립트를 불러옵니다. 이 과정에서 Google은 광고 제공, 빈도 제어, 방문 통계를 위해 쿠키·기기 정보·접속 정보를 처리할 수 있습니다. 거부해도 서비스의 모든 학습 콘텐츠를 이용할 수 있습니다.",
+          ],
+        },
+        {
+          heading: "동의 변경과 삭제",
+          paragraphs: [
+            "화면의 '쿠키 설정'에서 선택을 다시 할 수 있습니다. 브라우저의 사이트 데이터를 삭제하면 현재 기기의 학습 기록과 동의 기록이 삭제됩니다. 로그인 계정의 서버 데이터 삭제가 필요하면 문의 페이지로 요청해 주세요.",
+          ],
+        },
+        {
+          heading: "보안과 서비스 운영",
+          paragraphs: [
+            "호스팅·인증 제공자는 안전한 전송, 오류 대응, 남용 방지를 위해 일반적인 접속 로그를 처리할 수 있습니다. 정책과 처리 구조가 바뀐 경우 이 페이지를 갱신합니다.",
+          ],
+        },
+      ]}
+    />
+  );
+}

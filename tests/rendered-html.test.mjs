@@ -274,3 +274,10 @@ test("renders public content landmarks without duplicate h1 elements", async () 
     assert.match(html, /id="main-content"/);
   }
 });
+
+test("does not render ad or analytics scripts before configuration and consent", async () => {
+  const html = await (await render("/")).text();
+  assert.doesNotMatch(html, /adsbygoogle|pagead2\.googlesyndication|googletagmanager|data-ad-slot/);
+  assert.match(html, /쿠키와 광고 설정/);
+  assert.match(html, /필수만 사용/);
+});

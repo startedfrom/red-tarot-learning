@@ -30,6 +30,7 @@ import {
 } from "../lib/progress";
 import { SafetyNote } from "./SafetyNote";
 import { TarotCardVisual } from "./TarotCardVisual";
+import { AdSlot } from "./AdSlot";
 
 type LessonStage = 1 | 2 | 3 | 4 | 5;
 
@@ -358,9 +359,9 @@ export function PracticeLesson({
                   {saveMessage}
                 </p>
                 {completed ? (
-                  <Link className="next-lesson-link" href={`/practice/${nextLesson.id}`}>
+                  <><AdSlot placement="completion" /><Link className="next-lesson-link" href={`/practice/${nextLesson.id}`}>
                     다음 학습 이어가기 <ArrowRight aria-hidden="true" />
-                  </Link>
+                  </Link></>
                 ) : null}
               </section>
             )}

@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 import { ProgressProvider } from "./components/ProgressProvider";
+import { ConsentManager } from "./components/ConsentManager";
+import { AdScripts } from "./components/AdScripts";
+import { AnalyticsScripts } from "./components/AnalyticsScripts";
 
 const title = "빨강타로 — 외우지 말고 읽는 타로 학습";
 const description =
@@ -61,7 +64,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body><ProgressProvider>{children}</ProgressProvider></body>
+      <body><ConsentManager><AdScripts /><AnalyticsScripts /><ProgressProvider>{children}</ProgressProvider></ConsentManager></body>
     </html>
   );
 }
