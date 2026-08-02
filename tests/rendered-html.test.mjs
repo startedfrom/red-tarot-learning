@@ -86,8 +86,8 @@ test("renders an honest local-save recovery path when auth is not configured", a
   assert.match(html, /학습 기록은 이 기기에 저장돼요/);
   assert.match(html, /계정 연결은 준비 중/);
   assert.match(html, /로그인하지 않고 계속 학습/);
-  assert.doesNotMatch(html, /Google로 계속하기/);
-  assert.doesNotMatch(html, /Kakao로 계속하기/);
+  assert.doesNotMatch(html, /구글로 계속하기/);
+  assert.doesNotMatch(html, /카카오로 계속하기/);
   assert.doesNotMatch(html, /이메일로 코드 받기/);
   assert.match(html, /name="robots" content="noindex, nofollow"/);
 });
@@ -103,8 +103,8 @@ test("renders the fourteen day course introduction", async () => {
   const html = await response.text();
   assert.equal(response.status, 200);
   assert.match(html, /14일 타로 입문 코스/);
-  assert.match(html, /Day[^<]*<!-- -->1/);
-  assert.match(html, /Day[^<]*<!-- -->14/);
+  assert.match(html, /1<!-- -->일차/);
+  assert.match(html, /14<!-- -->일차/);
   assert.match(html, /근거로 읽는 방법/);
   assert.doesNotMatch(html, /name="robots" content="noindex/);
 });
@@ -122,6 +122,34 @@ test("renders a noindex course day and review page", async () => {
   assert.equal(reviewResponse.status, 200);
   assert.match(reviewHtml, /오답과 복습/);
   assert.match(reviewHtml, /name="robots" content="noindex, nofollow"/);
+});
+
+test("uses Korean interface labels across public and learning pages", async () => {
+  const paths = [
+    "/cards",
+    "/cards/the-lovers",
+    "/readings",
+    "/readings/love-three-001",
+    "/guides",
+    "/guides/upright-and-reversed",
+    "/course",
+    "/course/day/1",
+    "/practice/love-three-001",
+    "/review",
+    "/me",
+    "/about",
+    "/login",
+  ];
+  let html = "";
+  for (const pathname of paths) html += await (await render(pathname)).text();
+
+  assert.match(html, /78장 전체 보기/);
+  assert.match(html, /14일 학습 과정/);
+  assert.match(html, /빨강타로 안내/);
+  assert.doesNotMatch(
+    html,
+    /ALL 78 CARDS|MAJOR ARCANA|MINOR ARCANA|CURATED READINGS|BEGINNER GUIDE|CARD BOOK|START HERE|FREE BEGINNER COURSE|YOUR 14 DAYS|DAY \d+ OF 14|LEARNING GARDEN|REVIEW POCKET|MY CARD BOOK|SAVE YOUR PROGRESS|LOCAL LEARNING|STEP \d|QUICK QUIZ|\d+ CARDS/,
+  );
 });
 
 test("uses the homepage card filter query on first render", async () => {

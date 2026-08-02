@@ -41,7 +41,7 @@ export function AuthPanel({
         options: { redirectTo },
       });
       if (error) {
-        setMessage(`${provider === "google" ? "Google" : "Kakao"} 로그인을 시작하지 못했어요. 다시 시도해 주세요.`);
+        setMessage(`${provider === "google" ? "구글" : "카카오"} 로그인을 시작하지 못했어요. 다시 시도해 주세요.`);
       }
     } catch {
       setMessage("로그인 연결을 시작하지 못했어요. 잠시 후 다시 시도해 주세요.");
@@ -84,7 +84,7 @@ export function AuthPanel({
   return (
     <section className="auth-panel" aria-labelledby="login-title">
       <div className="auth-heading">
-        <span className="eyebrow">{configured ? "SAVE YOUR PROGRESS" : "LOCAL LEARNING"}</span>
+        <span className="eyebrow">{configured ? "학습 기록 저장" : "이 기기에 저장"}</span>
         <h1 id="login-title">
           {configured ? "로그인하고 학습 기록 저장하기" : "학습 기록은 이 기기에 저장돼요"}
         </h1>
@@ -112,7 +112,7 @@ export function AuthPanel({
               aria-busy={busy === "google"}
             >
               <span aria-hidden="true">G</span>
-              {busy === "google" ? "Google 연결 중…" : "Google로 계속하기"}
+              {busy === "google" ? "구글 연결 중…" : "구글로 계속하기"}
             </button>
             <button
               className="auth-provider auth-kakao"
@@ -121,7 +121,7 @@ export function AuthPanel({
               aria-busy={busy === "kakao"}
             >
               <span aria-hidden="true">K</span>
-              {busy === "kakao" ? "Kakao 연결 중…" : "Kakao로 계속하기"}
+              {busy === "kakao" ? "카카오 연결 중…" : "카카오로 계속하기"}
             </button>
           </div>
 

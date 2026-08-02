@@ -61,7 +61,7 @@ export function CardLibrary({ initialFilter = "all" }: { initialFilter?: CardFil
     <section className="card-library" aria-labelledby="library-title">
       <header className="library-heading">
         <div>
-          <span className="eyebrow">ALL 78 CARDS</span>
+          <span className="eyebrow">78장 전체 보기</span>
           <h1 id="library-title">78장 카드 도감</h1>
           <p>이름이나 기억나는 뜻을 입력하면 바로 찾을 수 있어요.</p>
         </div>

@@ -132,6 +132,33 @@ test("header learning link stays a plain navigation item instead of a pill", () 
   );
 });
 
+test("user-facing section labels avoid decorative English", () => {
+  const files = [
+    "app/components/AuthPanel.tsx",
+    "app/components/CardDetail.tsx",
+    "app/components/CardLibrary.tsx",
+    "app/components/CourseProgress.tsx",
+    "app/components/GuideArticle.tsx",
+    "app/components/HomeDashboard.tsx",
+    "app/components/InfoPage.tsx",
+    "app/components/PracticeLesson.tsx",
+    "app/components/ReadingArticle.tsx",
+    "app/course/page.tsx",
+    "app/course/day/[day]/page.tsx",
+    "app/guides/page.tsx",
+    "app/readings/page.tsx",
+    "app/review/page.tsx",
+  ];
+  const source = files.map(read).join("\n");
+
+  assert.doesNotMatch(
+    source,
+    /ALL 78 CARDS|MAJOR ARCANA|MINOR ARCANA|CURATED READINGS|BEGINNER GUIDE|CARD BOOK|START HERE|FREE BEGINNER COURSE|YOUR 14 DAYS|DAY \{?|LEARNING GARDEN|REVIEW POCKET|MY CARD BOOK|SAVE YOUR PROGRESS|LOCAL LEARNING|STEP \{?|QUICK QUIZ|CARDS/,
+  );
+  assert.doesNotMatch(read("app/components/TarotCardVisual.tsx"), /card\.nameEn/);
+  assert.match(read("app/components/CardDetail.tsx"), /className="english-name"/);
+});
+
 test("CI installs from the lockfile and runs all release checks on Node 24", () => {
   const workflow = read(".github/workflows/ci.yml");
   assert.match(workflow, /node-version:\s*["']?24/);

@@ -25,7 +25,7 @@ export function CardDetail({ card }: { card: TarotCard }) {
       <header className="card-detail-hero">
         <div className="detail-visual-wrap"><TarotCardVisual card={card} size="large" priority /><span className="detail-sticker" aria-hidden="true">{card.visual.glyph}</span></div>
         <div className="detail-heading">
-          <span className="eyebrow">{card.arcana === "major" ? "MAJOR ARCANA" : "MINOR ARCANA"} · {card.number}</span>
+          <span className="eyebrow">{card.arcana === "major" ? "메이저 아르카나" : "마이너 아르카나"} · {card.number}</span>
           <h1>{card.nameKo} 카드 뜻</h1>
           <p className="english-name">{card.nameEn}</p>
           <p className="card-answer">{card.coreMeaning}</p>

@@ -12,7 +12,7 @@ export default function CoursePage() {
   return (
     <AppShell active="course">
       <header className="course-hero">
-        <span className="eyebrow">FREE BEGINNER COURSE</span>
+        <span className="eyebrow">무료 입문 코스</span>
         <h1>14일 타로 입문 코스</h1>
         <p>외울 키워드를 늘리는 대신 질문·위치·카드 관계를 근거로 스스로 해석하는 순서를 익혀요.</p>
         <div className="course-facts" aria-label="코스 정보">

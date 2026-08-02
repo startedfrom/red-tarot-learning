@@ -98,7 +98,7 @@ export function ConsentManager({ children }: { children: ReactNode }) {
         <section className="consent-banner" role="dialog" aria-modal="false" aria-labelledby="consent-title">
           <div>
             <strong id="consent-title">쿠키와 광고 설정</strong>
-            <p>필수 저장은 학습 기록에만 사용합니다. 동의하면 Google 광고와 방문 통계를 불러오며, 거부해도 모든 콘텐츠를 무료로 볼 수 있어요. <Link href="/privacy">자세히 보기</Link></p>
+            <p>필수 저장은 학습 기록에만 사용합니다. 동의하면 구글 광고와 방문 통계를 불러오며, 거부해도 모든 콘텐츠를 무료로 볼 수 있어요. <Link href="/privacy">자세히 보기</Link></p>
           </div>
           <div className="consent-actions">
             <button type="button" className="secondary-button" onClick={() => choose("denied")}>필수만 사용</button>

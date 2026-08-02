@@ -755,22 +755,10 @@ a {
   text-align: center;
 }
 
-.tarot-label strong,
-.tarot-label small {
+.tarot-label strong {
   color: white;
   text-shadow: 0 1px 2px rgba(63, 20, 30, 0.22);
-}
-
-.tarot-label strong {
   font-size: 0.65em;
-}
-
-.tarot-label small {
-  margin-top: 2px;
-  font-family: Georgia, serif;
-  font-size: 0.34em;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .tarot-face.is-reversed .tarot-orbit,

@@ -40,7 +40,6 @@ export function TarotCardVisual({
           </div>
           <div className="tarot-label">
             <strong>{card.nameKo}</strong>
-            <small>{card.nameEn}</small>
           </div>
         </div>
       </div>

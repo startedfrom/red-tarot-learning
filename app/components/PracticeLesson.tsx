@@ -42,6 +42,9 @@ const stageLabels = [
   "종합 해설",
 ] as const;
 
+const practiceCategoryLabels = { love: "연애", money: "재물", health: "건강" } as const;
+const difficultyLabels = { intro: "입문", basic: "기본", advanced: "심화" } as const;
+
 export function PracticeLesson({
   lesson,
   cards,
@@ -106,7 +109,7 @@ export function PracticeLesson({
       <header className="practice-header">
         <div>
           <span className="eyebrow">
-            {lesson.category.toUpperCase()} · {lesson.difficulty.toUpperCase()} · {cards.length} CARDS
+            {practiceCategoryLabels[lesson.category]} · {difficultyLabels[lesson.difficulty]} · {cards.length}장 배열
           </span>
           <h1>카드를 연결해 한 문장으로 읽어봐요.</h1>
           <p>{lesson.question}</p>
@@ -174,7 +177,7 @@ export function PracticeLesson({
             {stage === 5 ? <BookOpenCheck /> : null}
           </span>
           <div>
-            <span className="eyebrow">STEP {stage} · {stageLabels[stage - 1]}</span>
+            <span className="eyebrow">{stage}단계 · {stageLabels[stage - 1]}</span>
             <h2 id="stage-title">
               {stage === 1 ? "먼저 내 말로 읽어볼까요?" : null}
               {stage === 2 ? "카드의 중심 동사를 꺼내봐요." : null}
@@ -318,7 +321,7 @@ export function PracticeLesson({
               </div>
             ) : (
               <section className="quiz-card">
-                <span className="eyebrow">QUICK QUIZ</span>
+                <span className="eyebrow">확인 문제</span>
                 <h3>{lesson.quiz.question}</h3>
                 <div className="quiz-options">
                   {lesson.quiz.options.map((option, index) => {

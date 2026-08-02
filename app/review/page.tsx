@@ -15,7 +15,7 @@ export default function ReviewPage() {
   return (
     <AppShell active="review">
       <section className="review-page">
-        <header><span className="eyebrow">REVIEW POCKET</span><h1>오답과 복습</h1><p>최근 헷갈린 해석부터 다시 풀어보세요. 맞힌 문제는 목록에서 자동으로 빠져요.</p></header>
+        <header><span className="eyebrow">다시 볼 문제</span><h1>오답과 복습</h1><p>최근 헷갈린 해석부터 다시 풀어보세요. 맞힌 문제는 목록에서 자동으로 빠져요.</p></header>
         <p className="sync-message" role="status">{userId ? syncMessage : "이 기기에 저장 중 · 로그인하면 다른 기기와 동기화돼요."}</p>
         {wrongLessons.length ? (
           <ol>{wrongLessons.map((lesson) => <li key={lesson.id}><div><span>{lesson.category === "love" ? "연애" : lesson.category === "money" ? "재물" : "건강"}</span><strong>{lesson.question}</strong><p>{lesson.headline}</p></div><Link href={`/practice/${lesson.id}`}>다시 풀기</Link></li>)}</ol>

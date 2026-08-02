@@ -23,7 +23,7 @@ export default async function CourseDayPage({ params }: { params: Promise<{ day:
       <article className="course-day-page">
         <nav className="breadcrumbs" aria-label="경로"><Link href="/course">14일 코스</Link><span>/</span><span>{day.day}일차</span></nav>
         <header>
-          <span className="eyebrow">DAY {day.day} OF 14</span>
+          <span className="eyebrow">14일 과정 · {day.day}일차</span>
           <h1>{day.day}일차 · {day.title}</h1>
           <p>{day.summary}</p>
         </header>
