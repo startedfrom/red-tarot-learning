@@ -142,7 +142,7 @@ a {
 
 .header-login-link {
   display: inline-flex;
-  min-height: 40px;
+  min-height: 44px;
   align-items: center;
   padding: 0 14px;
   border: 1px solid var(--line);
@@ -4398,7 +4398,7 @@ a {
   right: 18px;
   bottom: 88px;
   z-index: 30;
-  min-height: 38px;
+  min-height: 44px;
   padding: 0 13px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -4439,6 +4439,7 @@ a {
   .section-heading > a,
   .quick-search-links a,
   .site-footer a {
+    min-width: 44px;
     min-height: 44px;
   }
 
@@ -4448,6 +4449,7 @@ a {
   .site-footer a {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
   }
 
   .profile-dot {
