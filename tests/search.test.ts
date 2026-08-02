@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { allCards } from "../app/data/cards";
+import { guides } from "../app/data/guides";
+import { publicReadings } from "../app/lib/public-content";
 import { searchContent, searchEntries } from "../app/lib/search";
 
 test("builds entries for cards, guides, and curated readings", () => {
-  assert.equal(searchEntries.filter((entry) => entry.kind === "card").length, 78);
-  assert.equal(searchEntries.filter((entry) => entry.kind === "guide").length, 3);
-  assert.equal(searchEntries.filter((entry) => entry.kind === "reading").length, 30);
+  assert.equal(searchEntries.filter((entry) => entry.kind === "card").length, allCards.length);
+  assert.equal(searchEntries.filter((entry) => entry.kind === "guide").length, guides.length);
+  assert.equal(searchEntries.filter((entry) => entry.kind === "reading").length, publicReadings.length);
 });
 
 test("finds Korean card names and English card names", () => {
