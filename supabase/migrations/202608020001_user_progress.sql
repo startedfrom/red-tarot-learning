@@ -42,8 +42,6 @@ create table if not exists public.user_state (
   updated_at timestamptz not null default now()
 );
 
-create index if not exists profiles_updated_at_idx
-  on public.profiles (user_id, updated_at desc);
 create index if not exists lesson_completions_completed_at_idx
   on public.lesson_completions (user_id, completed_at desc);
 create index if not exists quiz_attempts_answered_at_idx
@@ -52,9 +50,6 @@ create index if not exists favorite_cards_changed_at_idx
   on public.favorite_cards (user_id, changed_at desc);
 create index if not exists study_days_created_at_idx
   on public.study_days (user_id, created_at desc);
-create index if not exists user_state_updated_at_idx
-  on public.user_state (user_id, updated_at desc);
-
 alter table public.profiles enable row level security;
 alter table public.lesson_completions enable row level security;
 alter table public.quiz_attempts enable row level security;
@@ -256,6 +251,9 @@ begin
   return new;
 end;
 $$;
+
+revoke execute on function public.handle_new_user()
+from public, anon, authenticated;
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created

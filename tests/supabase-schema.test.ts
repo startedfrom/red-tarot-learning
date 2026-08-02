@@ -235,6 +235,10 @@ test("creates profiles from auth metadata through a hardened trigger", () => {
     sql,
     /create\s+trigger\s+on_auth_user_created[\s\S]*after\s+insert\s+on\s+auth\.users[\s\S]*for\s+each\s+row[\s\S]*execute\s+function/i,
   );
+  assert.match(
+    sql,
+    /revoke\s+execute\s+on\s+function\s+public\.handle_new_user\(\)\s+from\s+public\s*,\s*anon\s*,\s*authenticated/i,
+  );
 });
 
 test("grants data access to authenticated users but not anonymous users", () => {
