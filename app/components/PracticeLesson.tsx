@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import type { TarotCard } from "../data/cards";
+import { useProgress } from "../hooks/use-progress";
 import {
   learningSets,
   type LearningSet,
@@ -26,11 +27,10 @@ import {
   markLessonComplete,
   recordQuizAnswer,
   recordStudyDay,
-  safeReadProgress,
-  safeWriteProgress,
 } from "../lib/progress";
 import { SafetyNote } from "./SafetyNote";
 import { TarotCardVisual } from "./TarotCardVisual";
+import { AdSlot } from "./AdSlot";
 
 type LessonStage = 1 | 2 | 3 | 4 | 5;
 
@@ -41,6 +41,9 @@ const stageLabels = [
   "카드 연결",
   "종합 해설",
 ] as const;
+
+const practiceCategoryLabels = { love: "연애", money: "재물", health: "건강" } as const;
+const difficultyLabels = { intro: "입문", basic: "기본", advanced: "심화" } as const;
 
 export function PracticeLesson({
   lesson,
@@ -56,6 +59,7 @@ export function PracticeLesson({
   const [completed, setCompleted] = useState(false);
   const [answerView, setAnswerView] = useState<"reading" | "quiz">("reading");
   const [saveMessage, setSaveMessage] = useState("");
+  const { updateProgress, syncMessage, userId } = useProgress();
   const lessonIndex = learningSets.findIndex((item) => item.id === lesson.id);
   const previousLesson =
     learningSets[(lessonIndex - 1 + learningSets.length) % learningSets.length];
@@ -75,33 +79,26 @@ export function PracticeLesson({
     }
 
     setSubmitted(true);
-    let storage: Storage | undefined;
-    try {
-      storage = window.localStorage;
-    } catch {
-      setSaveMessage("답은 확인할 수 있지만 학습 기록은 저장되지 않아요.");
-      return;
-    }
-
-    const current = safeReadProgress(storage);
-    const withQuiz = recordQuizAnswer(
-      current,
-      lesson.id,
-      quizChoice === lesson.quiz.answer,
-    );
-    const withCompletion = markLessonComplete(withQuiz, lesson.id);
     const now = new Date();
     const yesterdayDate = new Date(now);
     yesterdayDate.setDate(now.getDate() - 1);
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
     const yesterday = `${yesterdayDate.getFullYear()}-${String(yesterdayDate.getMonth() + 1).padStart(2, "0")}-${String(yesterdayDate.getDate()).padStart(2, "0")}`;
-    const next = recordStudyDay(withCompletion, today, yesterday);
-    const saved = safeWriteProgress(storage, next);
-    setCompleted(saved);
+    const result = updateProgress((current) => {
+      const withQuiz = recordQuizAnswer(
+        current,
+        lesson.id,
+        quizChoice === lesson.quiz.answer,
+        now.toISOString(),
+      );
+      const withCompletion = markLessonComplete(withQuiz, lesson.id, now.toISOString());
+      return recordStudyDay(withCompletion, today, yesterday, now.toISOString());
+    }, { kind: "lesson", entityId: lesson.id });
+    setCompleted(true);
     setSaveMessage(
-      saved
-        ? "오늘의 학습과 퀴즈 결과를 저장했어요!"
-        : "답은 확인할 수 있지만 학습 기록은 저장되지 않아요.",
+      result.savedLocally
+        ? `오늘의 학습과 퀴즈 결과를 저장했어요! ${userId ? syncMessage : ""}`.trim()
+        : "현재 화면에는 반영했지만 이 기기에 저장하지 못했어요.",
     );
   }
 
@@ -112,7 +109,7 @@ export function PracticeLesson({
       <header className="practice-header">
         <div>
           <span className="eyebrow">
-            {lesson.category.toUpperCase()} · {lesson.difficulty.toUpperCase()} · {cards.length} CARDS
+            {practiceCategoryLabels[lesson.category]} · {difficultyLabels[lesson.difficulty]} · {cards.length}장 배열
           </span>
           <h1>카드를 연결해 한 문장으로 읽어봐요.</h1>
           <p>{lesson.question}</p>
@@ -180,7 +177,7 @@ export function PracticeLesson({
             {stage === 5 ? <BookOpenCheck /> : null}
           </span>
           <div>
-            <span className="eyebrow">STEP {stage} · {stageLabels[stage - 1]}</span>
+            <span className="eyebrow">{stage}단계 · {stageLabels[stage - 1]}</span>
             <h2 id="stage-title">
               {stage === 1 ? "먼저 내 말로 읽어볼까요?" : null}
               {stage === 2 ? "카드의 중심 동사를 꺼내봐요." : null}
@@ -324,7 +321,7 @@ export function PracticeLesson({
               </div>
             ) : (
               <section className="quiz-card">
-                <span className="eyebrow">QUICK QUIZ</span>
+                <span className="eyebrow">확인 문제</span>
                 <h3>{lesson.quiz.question}</h3>
                 <div className="quiz-options">
                   {lesson.quiz.options.map((option, index) => {
@@ -365,9 +362,9 @@ export function PracticeLesson({
                   {saveMessage}
                 </p>
                 {completed ? (
-                  <Link className="next-lesson-link" href={`/practice/${nextLesson.id}`}>
+                  <><AdSlot placement="completion" /><Link className="next-lesson-link" href={`/practice/${nextLesson.id}`}>
                     다음 학습 이어가기 <ArrowRight aria-hidden="true" />
-                  </Link>
+                  </Link></>
                 ) : null}
               </section>
             )}

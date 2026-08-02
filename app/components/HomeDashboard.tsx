@@ -11,34 +11,17 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { allCards, majorArcana, type Category } from "../data/cards";
 import { getLessonCard, learningSets } from "../data/learning-sets";
-import {
-  defaultProgress,
-  safeReadProgress,
-  type LearningProgress,
-} from "../lib/progress";
+import { useProgress } from "../hooks/use-progress";
 import { TarotCardVisual } from "./TarotCardVisual";
 
 const dailyCard = majorArcana.find((card) => card.id === "the-lovers")!;
 const firstLesson = learningSets[0];
 
 export function HomeDashboard() {
-  const [progress, setProgress] = useState<LearningProgress>(defaultProgress);
-  const [storageAvailable, setStorageAvailable] = useState(true);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      try {
-        setProgress(safeReadProgress(window.localStorage));
-      } catch {
-        setStorageAvailable(false);
-      }
-    }, 0);
-
-    return () => window.clearTimeout(timer);
-  }, []);
+  const { progress, storageAvailable, syncMessage, userId } = useProgress();
 
   const completedLessons = useMemo(
     () =>
@@ -99,6 +82,9 @@ export function HomeDashboard() {
           수 있습니다.
         </p>
       ) : null}
+      <p className="sync-message" role="status">
+        {userId ? syncMessage : "로그인하면 다른 기기에서도 이 기록을 이어볼 수 있어요."}
+      </p>
 
       <section className="home-greeting">
         <div>
@@ -149,7 +135,7 @@ export function HomeDashboard() {
       <section className="home-section" aria-labelledby="garden-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">LEARNING GARDEN</span>
+            <span className="eyebrow">학습 현황</span>
             <h2 id="garden-title">나의 학습 정원</h2>
           </div>
           <div className="mastery-chip">
@@ -215,7 +201,7 @@ export function HomeDashboard() {
       <section className="home-section" id="review" aria-labelledby="review-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">REVIEW POCKET</span>
+            <span className="eyebrow">다시 볼 카드</span>
             <h2 id="review-title">최근 헷갈린 카드</h2>
           </div>
           {confusedCards.length ? (
@@ -248,7 +234,7 @@ export function HomeDashboard() {
       <section className="home-section favorites-section" aria-labelledby="favorite-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">MY CARD BOOK</span>
+            <span className="eyebrow">내 카드 모음</span>
             <h2 id="favorite-title">내가 찜한 카드</h2>
           </div>
           <BookHeart aria-hidden="true" />

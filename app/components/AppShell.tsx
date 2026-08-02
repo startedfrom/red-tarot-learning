@@ -1,23 +1,19 @@
 import Link from "next/link";
-import { BookOpen, Heart, Home, Sparkles } from "lucide-react";
+import { BookOpen, CalendarDays, Home, UserRound } from "lucide-react";
+import { AuthStatus } from "./AuthStatus";
 
-type ActiveSection = "home" | "cards" | "practice" | "review";
+type ActiveSection = "home" | "cards" | "readings" | "practice" | "course" | "review" | "me";
 
 const navItems = [
   { id: "home", label: "홈", href: "/", Icon: Home },
   { id: "cards", label: "카드", href: "/cards", Icon: BookOpen },
-  {
-    id: "practice",
-    label: "연습",
-    href: "/practice/love-three-001",
-    Icon: Sparkles,
-  },
-  { id: "review", label: "복습", href: "/#review", Icon: Heart },
+  { id: "course", label: "코스", href: "/course", Icon: CalendarDays },
+  { id: "me", label: "내 학습", href: "/me", Icon: UserRound },
 ] as const;
 
 export function AppShell({
   children,
-  active = "home",
+  active,
 }: {
   children: React.ReactNode;
   active?: ActiveSection;
@@ -36,15 +32,27 @@ export function AppShell({
             <span>빨강타로</span>
           </Link>
           <div className="header-links" aria-label="빠른 메뉴">
-            <Link href="/cards">78장 카드책</Link>
-            <Link href="/practice/love-three-001">150세트 연습</Link>
+            <Link href="/cards">카드 사전</Link>
+            <Link href="/readings">조합 예제</Link>
+            <Link href="/guides">기초 가이드</Link>
+            <Link href="/course">14일 코스</Link>
           </div>
-          <span className="profile-dot" aria-label="내 학습 기록">
-            나
-          </span>
+          <AuthStatus />
         </header>
 
         <main id="main-content">{children}</main>
+
+        <footer className="site-footer">
+          <nav aria-label="서비스 정보">
+            <Link href="/about">소개</Link>
+            <Link href="/editorial-policy">콘텐츠 기준</Link>
+            <Link href="/privacy">개인정보</Link>
+            <Link href="/terms">이용약관</Link>
+            <Link href="/disclaimer">해석의 한계</Link>
+            <Link href="/contact">문의</Link>
+          </nav>
+          <p>타로 설명은 학습과 자기성찰을 위한 참고 자료이며 의료·법률·재무 판단을 대신하지 않습니다.</p>
+        </footer>
 
         <nav className="bottom-nav" aria-label="주요 메뉴">
           {navItems.map(({ id, label, href, Icon }) => (

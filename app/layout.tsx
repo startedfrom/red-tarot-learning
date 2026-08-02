@@ -1,6 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
+import { ProgressProvider } from "./components/ProgressProvider";
+import { ConsentManager } from "./components/ConsentManager";
+import { AdScripts } from "./components/AdScripts";
+import { AnalyticsScripts } from "./components/AnalyticsScripts";
+import { adsenseAccountMeta } from "./lib/consent";
 
 const title = "빨강타로 — 외우지 말고 읽는 타로 학습";
 const description =
@@ -15,6 +20,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const protocol =
     requestHeaders.get("x-forwarded-proto") ??
     (host.startsWith("localhost") ? "http" : "https");
+  const adsenseAccount = adsenseAccountMeta(
+    process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID,
+  );
 
   return {
     metadataBase: new URL(`${protocol}://${host}`),
@@ -23,6 +31,9 @@ export async function generateMetadata(): Promise<Metadata> {
       template: "%s | 빨강타로",
     },
     description,
+    other: adsenseAccount
+      ? { "google-adsense-account": adsenseAccount }
+      : undefined,
     openGraph: {
       type: "website",
       locale: "ko_KR",
@@ -60,7 +71,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body><ConsentManager><AdScripts /><AnalyticsScripts /><ProgressProvider>{children}</ProgressProvider></ConsentManager></body>
     </html>
   );
 }
