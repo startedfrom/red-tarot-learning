@@ -10,6 +10,10 @@ function desktopAppStyles(styles: string) {
   return styles.slice(start, end);
 }
 
+function flowingDesktopStyles(styles: string) {
+  return styles.slice(styles.lastIndexOf("@media (min-width: 640px)"));
+}
+
 test("documents every required production environment variable", () => {
   const env = read(".env.example");
   for (const name of [
@@ -54,6 +58,7 @@ test("long pages release the desktop root and main scrolling locks", () => {
     "course-hero",
     "course-day-page",
     "review-page",
+    "practice-page",
   ]) {
     assert.match(styles, new RegExp(`html:has\\(\\.${pageClass}\\)`));
     assert.match(styles, new RegExp(`\\.app-shell:has\\(\\.${pageClass}\\)`));
@@ -69,11 +74,15 @@ test("desktop practice board does not clip its ribbon", () => {
   assert.match(styles, /\.spread-board\s*\{[\s\S]*?overflow:\s*visible;/);
 });
 
-test("desktop practice stage content scrolls instead of being clipped", () => {
-  const styles = desktopAppStyles(read("app/globals.css"));
+test("desktop practice expands in the document flow instead of clipping stages", () => {
+  const styles = flowingDesktopStyles(read("app/globals.css"));
   assert.match(
     styles,
-    /\.interpretation-step,[\s\S]*?\.full-answer\s*\{[\s\S]*?overflow-y:\s*auto;/,
+    /\.practice-page\s*\{[\s\S]*?height:\s*auto;[\s\S]*?grid-template-rows:\s*auto 48px auto 42px;[\s\S]*?overflow:\s*visible;/,
+  );
+  assert.match(
+    styles,
+    /\.app-shell:has\(\.practice-page\) \.lesson-stage-card,[\s\S]*?overflow:\s*visible;/,
   );
 });
 

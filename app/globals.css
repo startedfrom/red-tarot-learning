@@ -4595,6 +4595,7 @@ a {
   html:has(.course-hero),
   html:has(.course-day-page),
   html:has(.review-page),
+  html:has(.practice-page),
   body:has(.public-home),
   body:has(.card-article),
   body:has(.reading-article),
@@ -4605,7 +4606,8 @@ a {
   body:has(.auth-panel),
   body:has(.course-hero),
   body:has(.course-day-page),
-  body:has(.review-page) {
+  body:has(.review-page),
+  body:has(.practice-page) {
     height: auto;
     overflow-x: hidden;
     overflow-y: auto;
@@ -4621,7 +4623,8 @@ a {
   .app-shell:has(.auth-panel),
   .app-shell:has(.course-hero),
   .app-shell:has(.course-day-page),
-  .app-shell:has(.review-page) {
+  .app-shell:has(.review-page),
+  .app-shell:has(.practice-page) {
     display: block;
     width: min(100%, 1360px);
     height: auto;
@@ -4639,7 +4642,24 @@ a {
   .app-shell:has(.auth-panel) #main-content,
   .app-shell:has(.course-hero) #main-content,
   .app-shell:has(.course-day-page) #main-content,
-  .app-shell:has(.review-page) #main-content {
+  .app-shell:has(.review-page) #main-content,
+  .app-shell:has(.practice-page) #main-content {
+    overflow: visible;
+  }
+
+  .practice-page {
+    height: auto;
+    min-height: calc(100vh - 70px);
+    grid-template-rows: auto 48px auto 42px;
+    overflow: visible;
+  }
+
+  .app-shell:has(.practice-page) .lesson-stage-card,
+  .app-shell:has(.practice-page) .interpretation-step,
+  .app-shell:has(.practice-page) .hint-list,
+  .app-shell:has(.practice-page) .position-list,
+  .app-shell:has(.practice-page) .connection-step,
+  .app-shell:has(.practice-page) .full-answer {
     overflow: visible;
   }
 }
